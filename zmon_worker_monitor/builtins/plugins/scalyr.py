@@ -35,10 +35,10 @@ class ScalyrWrapperFactory(IFunctionFactoryPlugin):
 
 class ScalyrWrapper(object):
     def __init__(self, read_key, scalyr_region=None):
-        scalyr_prefix = SCALYR_URL_PREFIX_US
+        scalyr_prefix = SCALYR_URL_PREFIX_EU
 
-        if scalyr_region == 'eu':
-            scalyr_prefix = SCALYR_URL_PREFIX_EU
+        if scalyr_region == 'us':
+            scalyr_prefix = SCALYR_URL_PREFIX_US
 
         self.__query_url = '{}/query'.format(scalyr_prefix)
         self.__numeric_url = '{}/numericQuery'.format(scalyr_prefix)
