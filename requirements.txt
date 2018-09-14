@@ -7,15 +7,15 @@ dogpile.cache
 eventlog-writer==0.4.5
 flask-restful-swagger==0.19
 Flask-RESTful==0.3.5
-Flask==0.10.1
+flask==0.12.4
 functional
 ipaddress
 Jinja2
 jsonpath-rw
 MarkupSafe
 numpy
-opentracing>=1.2.2,<2
 opentracing-utils>=0.14
+opentracing>=1.2.2,<2
 prometheus_client
 pykube
 pymemcache>=1.4.3
