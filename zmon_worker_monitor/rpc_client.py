@@ -24,8 +24,6 @@ To execute the same example from the command line:
   python rpc_client.py http://localhost:8000/rpc_path my_method int:300 float:1.1 'js:{"age": 12, "name": "Peter Pan"}'
 
 """
-
-import sys
 import json
 import xmlrpc.client
 from functools import partial
@@ -94,56 +92,3 @@ def get_rpc_client_plus(endpoint):
     :return: rpc_client
     """
     return RpcClientPlus(endpoint)
-
-
-def __parse_cmd_line(args):
-    admitted_types = ('int', 'float', 'str')
-
-    cmd_parts = dict(_cmd_struct)
-    cmd_parts['endpoint'] = args[1]
-    cmd_parts['method_name'] = args[2]
-    cmd_parts['args'] = []
-
-    raw_method_args = args[3:]
-
-    for raw_arg in raw_method_args:
-
-        arg_parts = raw_arg.split(':')
-
-        if len(arg_parts) == 1 or arg_parts[0] not in admitted_types:
-            arg_type, arg_value = 'str', ':'.join(arg_parts[0:])
-            if arg_value.isdigit():
-                arg_type = 'int'
-            elif not (arg_value.startswith('.') or arg_value.endswith('.')) and arg_value.replace('.', '', 1).isdigit():
-                arg_type = 'float'
-        else:
-            arg_type, arg_value = arg_parts[0], ':'.join(arg_parts[1:])
-
-        try:
-            value = eval('{0}({1})'.format(arg_type, arg_value)) if arg_type != 'str' else arg_value
-        except Exception:
-            print("\n Error: Detected argument with wrong format", file=sys.stderr)
-            sys.exit(3)
-
-        cmd_parts['args'].append(value)
-
-    return cmd_parts
-
-
-if __name__ == '__main__':
-
-    if len(sys.argv) <= 2:
-        print('usage: {0} http://<host>:<port>/<rpc_path> <method_name> [ [int|float|str]:arg1 ' \
-                             '[int|float|str]:arg2 ...[int|float|str]:argN ...]'.format(sys.argv[0]), file=sys.stderr)
-        sys.exit(1)
-
-    cmd_line = __parse_cmd_line(sys.argv[:])
-
-    if DEBUG:
-        print('Parsed cmd_line: ', cmd_line)
-
-    # Executing now the remote method
-    client = get_rpc_client_plus(cmd_line['endpoint'])
-    result = client.call_rpc_method(cmd_line['method_name'], *cmd_line['args'])
-    if result is not None:
-        print(">>Result:\n", result)

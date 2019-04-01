@@ -39,8 +39,10 @@ __flag_dict = None
 def flag_dict():
     global __flag_dict
     if __flag_dict is None:
-        __flag_dict = {f: v for f, v in list(vars().items()) if f.isupper() and not (f.startswith('__') or callable(v)) and
-                       __is_pow2(v)}
+        __flag_dict = {
+            f: v for f, v in list(vars().items())
+            if f.isupper() and not (f.startswith('__') or callable(v)) and is_pow2(v)
+        }
     return __flag_dict
 
 
@@ -56,6 +58,6 @@ def has_flag(number, flag):
     return number & flag == flag
 
 
-def __is_pow2(x):
+def is_pow2(x):
     i = x if str(x).isdigit() else -1
     return True if i > 0 and i & (i - 1) == 0 else False

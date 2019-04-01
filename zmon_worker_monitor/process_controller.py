@@ -490,7 +490,8 @@ class ProcessPlus(Process):
             assert event['type'] in self.event_types, 'Unrecognized event type: {}'.format(event['type'])
             assert event['repeats'] >= 1, 'Not valid repeat number: Must be greater than 1'
             assert set(event.keys()) == set(self._event_template.keys()), 'Malformed data: {}'.format(event)
-            assert not [1 for v in list(event.values()) if v is None], 'event {} with None value is not valid'.format(event)
+            assert not ([1 for v in list(event.values()) if v is None],
+                        'event {} with None value is not valid'.format(event))
         except Exception as e:
             self.logger.exception('Bad event: ')
             raise AssertionError(str(e))
@@ -667,19 +668,19 @@ class ProcessGroup(IterableUserDict):
             self.logger.exception("Spawn of process failed. Caught exception with details: ")
             raise
 
-    def spawn_many(self, N, target=None, args=None, kwargs=None, flags=None):
+    def spawn_many(self, num, target=None, args=None, kwargs=None, flags=None):
 
-        self.logger.debug('spawn_many called with: target=%s, N=%s, args=%s, kwargs=%s, flags=%s', repr(target), N,
+        self.logger.debug('spawn_many called with: target=%s, N=%s, args=%s, kwargs=%s, flags=%s', repr(target), num,
                           args, kwargs, flags)
         n_success = 0
-        for i in range(N):
+        for i in range(num):
             try:
                 self.spawn_process(target=target, args=args, kwargs=kwargs, flags=flags)
             except Exception:
                 self.logger.exception('Failed to start process. Reason: ')
             else:
                 n_success += 1
-        return n_success == N  # TODO: better return n_success
+        return n_success == num  # TODO: better return n_success
 
     def get_by_pid(self, pid):
         for name, proc in list(self.items()):
