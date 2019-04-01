@@ -5,7 +5,7 @@ import logging
 import sys
 import json
 
-from urllib2 import urlparse
+import urllib.parse as urlparse
 
 import requests
 import tokens

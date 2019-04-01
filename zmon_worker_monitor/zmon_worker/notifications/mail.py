@@ -2,12 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-import smtplib
 import logging
-import jinja2
 import traceback
+import urllib.parse as urlparse
 
-from urllib2 import urlparse
+import smtplib
+import jinja2
 
 from opentracing_utils import trace, extract_span_from_kwargs
 

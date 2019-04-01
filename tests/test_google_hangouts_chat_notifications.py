@@ -7,6 +7,9 @@ HEADERS = {
     'Content-type': 'application/json',
 }
 
+URL = 'http://chat.example.org/v1/spaces/XYZ/messages?threadKey=123&key=123&token=ABC'
+
+
 NotifyGoogleHangoutsChat._config = {'zmon.host': 'https://zmon.example.org'}
 
 
@@ -40,7 +43,5 @@ def test_google_hangouts_chat_notification(monkeypatch):
     }
 
     assert r == 0
-
-    URL = 'http://chat.example.org/v1/spaces/XYZ/messages?threadKey=123&key=123&token=ABC'
 
     post.assert_called_with(URL, json=data, headers=HEADERS, timeout=5)

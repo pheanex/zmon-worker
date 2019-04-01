@@ -3,9 +3,9 @@ import json
 import logging
 import traceback
 
-import requests
+import urllib.parse as urlparse
 
-from urllib2 import urlparse
+import requests
 
 from opentracing_utils import trace, extract_span_from_kwargs
 

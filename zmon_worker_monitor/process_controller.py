@@ -13,7 +13,7 @@ import logging
 
 from multiprocessing import Process
 from threading import Thread
-from UserDict import IterableUserDict
+from collections import UserDict
 from collections import defaultdict, Iterable
 from functools import wraps
 from datetime import timedelta
@@ -577,7 +577,7 @@ class ProcessPlus(Process):
         return self.__repr__()
 
 
-class ProcessGroup(IterableUserDict):
+class ProcessGroup(UserDict):
     """
     Dict-like container of ProcessPlus objects: {process_name => process}
     Perform simple operations on the collection.
@@ -615,7 +615,7 @@ class ProcessGroup(IterableUserDict):
         self.stop_action = True
         self.action_loop_interval = 1  # seconds between each actions pass
 
-        IterableUserDict.__init__(self)
+        UserDict.__init__(self)
 
     def _v_or_def(self, **kw):
         assert len(kw) == 1, 'Wrong call, example of right use: self._val_or_def(kill_wait=10)'

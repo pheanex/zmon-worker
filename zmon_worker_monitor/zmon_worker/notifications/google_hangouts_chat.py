@@ -4,7 +4,7 @@ import traceback
 
 import requests
 
-from urllib2 import urlparse
+import urllib.parse as urlparse
 
 from opentracing_utils import trace, extract_span_from_kwargs
 
@@ -22,11 +22,13 @@ class NotifyGoogleHangoutsChat(BaseNotification):
 
         current_span = extract_span_from_kwargs(**kwargs)
 
-        webhook_link = kwargs.get('webhook_link', 'http://no.webhook.link?wrong')
+        webhook_link = kwargs.get(
+            'webhook_link', 'http://no.webhook.link?wrong')
         multiline = kwargs.get('multiline', True)
         webhook_link_split = webhook_link.split('?')
         alert_id = alert['alert_def']['id']
-        webhook_link = webhook_link_split[0] + '?threadKey={}&'.format(alert_id) + webhook_link_split[1]
+        webhook_link = webhook_link_split[0] + \
+            '?threadKey={}&'.format(alert_id) + webhook_link_split[1]
 
         repeat = kwargs.get('repeat', 0)
         alert_def = alert['alert_def']
@@ -43,13 +45,16 @@ class NotifyGoogleHangoutsChat(BaseNotification):
 
         current_span.log_kv({'room': kwargs.get('room')})
 
-        color = '#0CB307' if alert and not alert.get('is_alert') else kwargs.get('color', '#FF0000')
-        logo = 'FLIGHT_ARRIVAL' if alert and not alert.get('is_alert') else kwargs.get('logo', 'FLIGHT_DEPARTURE')
+        color = '#0CB307' if alert and not alert.get(
+            'is_alert') else kwargs.get('color', '#FF0000')
+        logo = 'FLIGHT_ARRIVAL' if alert and not alert.get(
+            'is_alert') else kwargs.get('logo', 'FLIGHT_DEPARTURE')
 
-        message_text = cls._get_subject(alert, custom_message=kwargs.get('message'))
+        message_text = cls._get_subject(alert, custom_message=str(kwargs.get('message')))
 
         zmon_host = kwargs.get('zmon_host', cls._config.get('zmon.host'))
-        alert_url = urlparse.urljoin(zmon_host, '/#/alert-details/{}'.format(alert_id)) if zmon_host else ''
+        alert_url = urlparse.urljoin(
+            zmon_host, '/#/alert-details/{}'.format(alert_id)) if zmon_host else ''
 
         message = {
             "cards": [
@@ -62,12 +67,12 @@ class NotifyGoogleHangoutsChat(BaseNotification):
                                         "content": '<font color="{}">{}!</font>'.format(color, message_text),
                                         "contentMultiline": multiline,
                                         "onClick": {
-                                             "openLink": {
+                                            "openLink": {
                                                 "url": "{}".format(alert_url)
-                                             }
-                                         },
+                                            }
+                                        },
                                         "icon": "{}".format(logo)
-                                     }
+                                    }
                                 }
                             ]
                         }
