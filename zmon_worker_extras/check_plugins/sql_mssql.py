@@ -46,7 +46,7 @@ class MsSqlFactory(IFunctionFactoryPlugin):
 def _import_db_driver():
     try:
         _cx_MsSql = __import__('pymssql', globals(), locals(), [], -1)
-    except Exception, e:
+    except Exception as e:
         logger.exception('Import of module pymssql failed')
         raise
     return _cx_MsSql
@@ -65,8 +65,8 @@ class MsSqlWrapper(object):
                 self.__conn = self.__cx_MsSql.connect('{}:{}'.format(host, port), user, password, database, timeout,
                                                       as_dict=True)
                 self.__cursor = self.__conn.cursor()
-            except Exception, e:
-                raise DbError(str(e), operation='Connect to {}:{}'.format(host, port)), None, sys.exc_info()[2]
+            except Exception as e:
+                raise DbError(str(e), operation='Connect to {}:{}'.format(host, port)).with_traceback(sys.exc_info()[2])
 
     def execute(self, stmt):
         self.__stmt = stmt
@@ -86,11 +86,11 @@ class MsSqlWrapper(object):
                         result = row
                 finally:
                     cur.close()
-        except Exception, e:
-            raise DbError(str(e), operation=self.__stmt), None, sys.exc_info()[2]
+        except Exception as e:
+            raise DbError(str(e), operation=self.__stmt).with_traceback(sys.exc_info()[2])
 
         if len(result) == 1:
-            return result.values()[0]
+            return list(result.values())[0]
         else:
             return result
 
@@ -108,8 +108,8 @@ class MsSqlWrapper(object):
                         results.append(row)
                 finally:
                     cur.close()
-        except Exception, e:
-            raise DbError(str(e), operation=self.__stmt), None, sys.exc_info()[2]
+        except Exception as e:
+            raise DbError(str(e), operation=self.__stmt).with_traceback(sys.exc_info()[2])
         return results
 
 
@@ -124,10 +124,10 @@ if __name__ == '__main__':
         if len(sys.argv) == 7:
             sql_stmt = sys.argv[6]
         else:
-            print 'executing default statement:', default_sql_stmt
+            print('executing default statement:', default_sql_stmt)
             sql_stmt = default_sql_stmt
 
-        print '>>> one result:\n', check.execute(sql_stmt).result()
+        print('>>> one result:\n', check.execute(sql_stmt).result())
         # print '>>> many results:\n', check.execute(sql_stmt).results()
     else:
-        print '{} <host> <port> <database> [sql_stmt]'.format(sys.argv[0])
+        print('{} <host> <port> <database> [sql_stmt]'.format(sys.argv[0]))

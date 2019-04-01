@@ -76,7 +76,7 @@ class SAMLWrapper(object):
                     'submit': 'Login'}
 
             r = session.post(r.url, data=data, timeout=self.timeout, verify=self.verify)
-        except Exception, e:
+        except Exception as e:
             raise SAMLError("failed to call SAML: " + str(e))
 
         saml_xml = get_saml_response(r.text)

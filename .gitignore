@@ -15,3 +15,5 @@ htmlcov/
 rpc_server.log
 build/
 scm-source.json
+
+*.py.bak

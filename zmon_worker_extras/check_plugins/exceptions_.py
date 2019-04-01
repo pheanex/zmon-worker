@@ -93,8 +93,8 @@ def maybe_comma_join(s):
     >>> maybe_comma_join([1, 2, 3])
     u'1,2,3'
 
-    >>> maybe_comma_join([u'\u03B1', u'\u03B2', u'\u03B3'])
-    u'\u03b1,\u03b2,\u03b3'
+    >>> maybe_comma_join([u'\\u03B1', u'\\u03B2', u'\\u03B3'])
+    u'\\u03b1,\\u03b2,\\u03b3'
 
     >>> maybe_comma_join([])
     ''
@@ -102,8 +102,8 @@ def maybe_comma_join(s):
     >>> maybe_comma_join('abc')
     'abc'
 
-    >>> maybe_comma_join(u'\u03B1\u03B2\u03B3')
-    u'\u03b1\u03b2\u03b3'
+    >>> maybe_comma_join(u'\\u03B1\\u03B2\\u03B3')
+    u'\\u03b1\\u03b2\\u03b3'
 
     >>> maybe_comma_join('')
     ''
@@ -112,7 +112,7 @@ def maybe_comma_join(s):
     123
     """
 
-    if isinstance(s, Iterable) and not isinstance(s, basestring):
-        return ','.join(unicode(e) for e in s)
+    if isinstance(s, Iterable) and not isinstance(s, str):
+        return ','.join(str(e) for e in s)
     else:
         return s

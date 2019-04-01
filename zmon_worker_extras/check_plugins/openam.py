@@ -85,12 +85,12 @@ class OpenAMWrapper(object):
                 timeout=self.timeout,
                 verify=self.verify,
             )
-        except Exception, e:
+        except Exception as e:
             raise OpenAMError("failed to call OpenAM: "+str(e))
 
         try:
             data = r.json()
-        except Exception, e:
+        except Exception as e:
             raise OpenAMError("failed to parse OpenAM json: "+str(e))
 
         result = {}

@@ -80,10 +80,10 @@ class JoblocksWrapper(object):
     def results(self, expected_duration=None):
         hosts = self._get_hosts(JoblocksWrapper.LOCKING_NODE_ROLE_ID, JoblocksWrapper.ALLOCATED_STATUS_ID)
         host_connections = dict((host.hostname, redis.StrictRedis(host=host.hostname)) for host in hosts)
-        host_keys = dict((host, con.keys(self.pattern)) for (host, con) in host_connections.iteritems())
+        host_keys = dict((host, con.keys(self.pattern)) for (host, con) in host_connections.items())
         str_results = []
 
-        for host, keys in host_keys.iteritems():
+        for host, keys in host_keys.items():
             p = host_connections[host].pipeline()
             for key in keys:
                 p.get(key)
@@ -111,8 +111,8 @@ if __name__ == '__main__':
     import sys
 
     if len(sys.argv) != 2:
-        print "usage: {} <cmdb_url>".format(sys.argv[0])
+        print("usage: {} <cmdb_url>".format(sys.argv[0]))
         sys.exit(1)
 
     res = JoblocksWrapper(cmdb_url=sys.argv[1], environment='LIVE').results(expected_duration=60000)
-    print res
+    print(res)

@@ -312,16 +312,16 @@ class NagiosWrapper(object):
                                                                                                   a=cmd_args))
         try:
             output = subprocess32.check_output(cmd, shell=False, timeout=timeout)
-        except subprocess32.CalledProcessError, e:
+        except subprocess32.CalledProcessError as e:
             e = fix_sub32_exc(e)
             if e.returncode < 3:
                 output = str(e.output)
             else:
                 output = str(e.output)
                 return output
-        except subprocess32.TimeoutExpired, e:
+        except subprocess32.TimeoutExpired as e:
             e = fix_sub32_exc(e)
-            raise NagiosError(str(e)), None, sys.exc_info()[2]
+            raise NagiosError(str(e)).with_traceback(sys.exc_info()[2])
         logger.debug('output for cmd (%s): %s', cmd, output)
         return self.__nrpe_config[check]['parser'](output)
 
@@ -337,16 +337,16 @@ class NagiosWrapper(object):
         cmd = shlex.split('/usr/lib/nagios/plugins/{c} {a}'.format(c=check, a=cmd_args))
         try:
             output = subprocess32.check_output(cmd, shell=False, timeout=timeout)
-        except subprocess32.CalledProcessError, e:
+        except subprocess32.CalledProcessError as e:
             e = fix_sub32_exc(e)
             if e.returncode < 3:
                 output = str(e.output)
             else:
                 output = str(e.output)
                 return output
-        except subprocess32.TimeoutExpired, e:
+        except subprocess32.TimeoutExpired as e:
             e = fix_sub32_exc(e)
-            raise NagiosError(str(e)), None, sys.exc_info()[2]
+            raise NagiosError(str(e)).with_traceback(sys.exc_info()[2])
         logger.debug('output for cmd (%s): %s', cmd, output)
         return self.__local_config[check]['parser'](output)
 
@@ -364,16 +364,16 @@ class NagiosWrapper(object):
                                                                                                   a=cmd_args))
         try:
             output = subprocess32.check_output(cmd, shell=False, timeout=timeout)
-        except subprocess32.CalledProcessError, e:
+        except subprocess32.CalledProcessError as e:
             e = fix_sub32_exc(e)
             if e.returncode < 3:
                 output = str(e.output)
             else:
                 output = str(e.output)
                 return output
-        except subprocess32.TimeoutExpired, e:
+        except subprocess32.TimeoutExpired as e:
             e = fix_sub32_exc(e)
-            raise NagiosError(str(e)), None, sys.exc_info()[2]
+            raise NagiosError(str(e)).with_traceback(sys.exc_info()[2])
         logger.debug('output for cmd (%s): %s', cmd, output)
         return self.__win_config[check]['parser'](output)
 
@@ -514,7 +514,7 @@ class NagiosWrapper(object):
         '''
 
         po = dict(re.findall('([a-z][a-z0-9 ]+): ([a-z0-9.()]+)', output, re.IGNORECASE))
-        for k, v in po.items():
+        for k, v in list(po.items()):
             if not re.match('[a-z()]', v, re.IGNORECASE):
                 po[k] = float(v)
         return po
@@ -622,22 +622,22 @@ if __name__ == '__main__':
     if len(sys.argv) == 3:
         checkname = sys.argv[2]
         check = NagiosWrapper(sys.argv[1])
-        print json.dumps(check.nrpe(checkname), indent=4)
+        print(json.dumps(check.nrpe(checkname), indent=4))
     elif len(sys.argv) == 4:
         checkname = sys.argv[2]
         query = sys.argv[3]
         check = NagiosWrapper(sys.argv[1])
-        print json.dumps(check.win(checkname, query=query), indent=4)
+        print(json.dumps(check.win(checkname, query=query), indent=4))
     elif len(sys.argv) == 5:
         checkname = sys.argv[2]
         path = sys.argv[3]
         query = sys.argv[4]
         check = NagiosWrapper(sys.argv[1])
-        print json.dumps(check.win(checkname, path=path, query=query), indent=4)
+        print(json.dumps(check.win(checkname, path=path, query=query), indent=4))
     elif len(sys.argv) == 6:
         checkname = sys.argv[2]
         directory = sys.argv[3]
         epoch = sys.argv[4]
         name = sys.argv[5]
         check = NagiosWrapper(sys.argv[1])
-        print json.dumps(check.nrpe(checkname, directory=directory, epoch=epoch, name=name), indent=4)
+        print(json.dumps(check.nrpe(checkname, directory=directory, epoch=epoch, name=name), indent=4))

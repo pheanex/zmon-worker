@@ -75,7 +75,7 @@ class SnmpWrapper(object):
             'ram_buffer': '1.3.6.1.4.1.2021.4.14.0',
             'ram_cache': '1.3.6.1.4.1.2021.4.15.0',
         }
-        for k, oid in oids.items():
+        for k, oid in list(oids.items()):
             val = self._get_cmd(oid)
             result[k] = self.parse(Integer, int, val)
         return result
@@ -89,7 +89,7 @@ class SnmpWrapper(object):
         result = {}
         oids = {'load1': '1.3.6.1.4.1.2021.10.1.3.1', 'load5': '1.3.6.1.4.1.2021.10.1.3.2',
                 'load15': '1.3.6.1.4.1.2021.10.1.3.3'}
-        for k, oid in oids.items():
+        for k, oid in list(oids.items()):
             val = self._get_cmd(oid)
             result[k] = self.parse(OctetString, lambda x: float(str(x)), val)
         return result
@@ -104,7 +104,7 @@ class SnmpWrapper(object):
         result = {}
         oids = {'cpu_idle': '1.3.6.1.4.1.2021.11.11.0', 'cpu_user': '1.3.6.1.4.1.2021.11.9.0',
                 'cpu_system': '1.3.6.1.4.1.2021.11.10.0'}
-        for k, oid in oids.items():
+        for k, oid in list(oids.items()):
             val = self._get_cmd(oid)
             result[k] = self.parse(Integer, int, val)
         return result
@@ -117,7 +117,7 @@ class SnmpWrapper(object):
             'raw_cpu_nice': '.1.3.6.1.4.1.2021.11.51.0',
             'raw_cpu_idle': '.1.3.6.1.4.1.2021.11.53.0',
         }
-        for k, oid in oids.items():
+        for k, oid in list(oids.items()):
             val = self._get_cmd(oid)
             result[k] = self.parse(Counter32, int, val)
         return result

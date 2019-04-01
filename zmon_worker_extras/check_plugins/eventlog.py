@@ -72,10 +72,10 @@ class EventLogWrapper(object):
         CheckError: EventLog type ID is out of range
         '''
 
-        if isinstance(event_type_ids, (int, long)):
+        if isinstance(event_type_ids, int):
             event_type_ids = [event_type_ids]
         for type_id in event_type_ids:
-            if not isinstance(type_id, (int, long)):
+            if not isinstance(type_id, int):
                 raise CheckError('EventLog type ID must be a integer')
             if type_id < 0x1001 or type_id > 0xfffff:
                 raise CheckError('EventLog type ID is out of range')
@@ -109,6 +109,6 @@ if __name__ == '__main__':
     # eventlog = EventLogWrapper()
     eventlog = EventLogWrapper(http_wrapper=http, url=eventlog_url)
 
-    print eventlog.count(0x96001, time_from='-1m')
-    print eventlog.count([0x96001, 0x63005], time_from='-1m')
-    print eventlog.count(0x96001, time_from='-1m', group_by='appDomainId')
+    print(eventlog.count(0x96001, time_from='-1m'))
+    print(eventlog.count([0x96001, 0x63005], time_from='-1m'))
+    print(eventlog.count(0x96001, time_from='-1m', group_by='appDomainId'))
