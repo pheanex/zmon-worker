@@ -13,7 +13,7 @@ import socket
 import sys
 import traceback
 import time
-import urllib.request, urllib.parse, urllib.error
+import urllib
 from urllib3.util import parse_url
 import math
 import numpy
@@ -748,7 +748,7 @@ def build_default_context():
         'unichr': chr,
         'unicode': str,
         'urlparse': urlparse,
-        'xrange': xrange,
+        'xrange': range,
         'zip': zip,
     }
 
@@ -1317,7 +1317,7 @@ class MainTask(object):
             raise CheckError(str(e))
         except (SecurityError, InsufficientPermissionsError) as e:
             raise(e)
-        except Exception as e:
+        except Exception:
             raise Exception(traceback.format_exc())
 
     def _get_check_result(self, req):
@@ -1496,7 +1496,7 @@ class MainTask(object):
                                                                                    req['entity'],
                                                                                    captures,
                                                                                    alert_parameters))
-        except Exception as e:
+        except Exception:
             captures['exception'] = traceback.format_exc()
             result = True
 
@@ -1514,7 +1514,7 @@ class MainTask(object):
             pure_captures = captures.copy()
             try:
                 captures = {k: p['value'] for k, p in list(alert_parameters.items())}
-            except Exception as e:
+            except Exception:
                 self.logger.exception('Error when capturing parameters: ')
             captures.update(pure_captures)
 

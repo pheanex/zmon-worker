@@ -1,5 +1,5 @@
 import logging
-import urllib.request, urllib.parse, urllib.error
+import urllib
 import json
 import traceback
 
@@ -63,8 +63,8 @@ class NotifyHipchat(BaseNotification):
 
         try:
             logger.info(
-                'Sending to: ' + '{}/v2/room/{}/notification?auth_token={}'.format(url, urllib.parse.quote(kwargs['room']),
-                                                                                   token) + ' ' + json.dumps(message))
+                'Sending to: ' + '{}/v2/room/{}/notification?auth_token={}'.format(
+                    url, urllib.parse.quote(kwargs['room']), token) + ' ' + json.dumps(message))
             r = requests.post(
                 '{}/v2/room/{}/notification'.format(url, urllib.parse.quote(kwargs['room'])),
                 json=message, params={'auth_token': token}, headers={'Content-type': 'application/json'})

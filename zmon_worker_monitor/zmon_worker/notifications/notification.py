@@ -58,7 +58,7 @@ class BaseNotification(object):
             replacements = {'entities': alert['entity']['id']}
             replacements.update(alert['captures'])
             return name.format(**replacements)
-        except KeyError as e:
+        except KeyError:
             return name  # This is fairly normal. Just use the unformatted name.
         except Exception as e:
             return "<<< Unformattable name '{name}': {message} >>>".format(name=name, message=e)

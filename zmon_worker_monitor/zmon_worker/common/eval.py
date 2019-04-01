@@ -176,7 +176,7 @@ def safe_eval(expr, eval_source='<string>', **kwargs):
         if isinstance(x, ast.FunctionDef) or isinstance(x, ast.ClassDef):
             cc = compile(node, eval_source, 'exec')  # can be nicely cached
             v = {}
-            exec (cc, g, v)
+            exec(cc, g, v)
             if len(v) == 1:
                 c = next(iter(v.values()))
                 if isclass(c):
