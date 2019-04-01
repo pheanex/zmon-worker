@@ -43,10 +43,10 @@ def fx_alarms(request):
 def transform_kwargs(kwargs):
     t = {}
 
-    for k, v in kwargs.items():
+    for k, v in list(kwargs.items()):
         t[''.join([s.capitalize() for s in k.split('_')])] = v
 
-    if 'AlarmNames' in t and isinstance(t['AlarmNames'], basestring):
+    if 'AlarmNames' in t and isinstance(t['AlarmNames'], str):
         t['AlarmNames'] = [t['AlarmNames']]
 
     if 'MaxRecords' not in t:

@@ -19,7 +19,7 @@ class TestBaseNotification(unittest.TestCase):
             'captures': captures,
             'entity': entity,
         }
-        self.assertEquals(BaseNotification._get_subject(ctx), 'NEW ALERT: everything is broken on everything')
+        self.assertEqual(BaseNotification._get_subject(ctx), 'NEW ALERT: everything is broken on everything')
 
     def test_get_subject_success_no_event(self):
         alert = {'name': '{thing} is {status}'}
@@ -32,7 +32,7 @@ class TestBaseNotification(unittest.TestCase):
             'captures': captures,
             'entity': entity,
         }
-        self.assertEquals(BaseNotification._get_subject(ctx, include_event=False), 'everything is broken on everything')
+        self.assertEqual(BaseNotification._get_subject(ctx, include_event=False), 'everything is broken on everything')
 
     def test_get_subject_with_bad_capture(self):
         alert = {'name': '{thingy} is {result}'}
@@ -45,7 +45,7 @@ class TestBaseNotification(unittest.TestCase):
             'captures': captures,
             'entity': entity,
         }
-        self.assertEquals(BaseNotification._get_subject(ctx), 'NEW ALERT: {thingy} is {result} on everything')
+        self.assertEqual(BaseNotification._get_subject(ctx), 'NEW ALERT: {thingy} is {result} on everything')
 
     def test_get_subject_with_bad_formatting(self):
         alert = {'name': '{thing:w} is {status}'}
@@ -58,6 +58,6 @@ class TestBaseNotification(unittest.TestCase):
             'captures': captures,
             'entity': entity,
         }
-        self.assertEquals(BaseNotification._get_subject(ctx),
+        self.assertEqual(BaseNotification._get_subject(ctx),
                           "NEW ALERT: <<< Unformattable name '{thing:w} is {status}': "
                           "Unknown format code 'w' for object of type 'str' >>> on everything")

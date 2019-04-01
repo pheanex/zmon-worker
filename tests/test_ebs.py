@@ -25,7 +25,7 @@ def test_listing_snapshots(monkeypatch):
     snap_list = ebs_wrapper.list_snapshots()
 
     assert snap_list is not None
-    assert snap_list.items() == [{
+    assert list(snap_list.items()) == [{
         'id': 'snap-12345',
         'description': 'dummy',
         'size': 123,

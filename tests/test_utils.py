@@ -1,4 +1,4 @@
-import Queue
+import queue
 
 from mock import MagicMock
 
@@ -59,7 +59,7 @@ def test_periodic_buffered_action_retries_exceeded(monkeypatch):
 
 def test_periodic_buffered_action_queue_full():
     queue = MagicMock()
-    queue.put_nowait.side_effect = Queue.Full()
+    queue.put_nowait.side_effect = queue.Full()
     pba = PeriodicBufferedAction(action=None)
     pba._queue = queue
     pba.log = MagicMock()

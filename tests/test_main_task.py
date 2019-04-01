@@ -12,6 +12,7 @@ from zmon_worker_monitor.zmon_worker.tasks.main import (
     MAX_RESULT_KEYS, ResultSizeError, DEFAULT_CHECK_RESULTS_HISTORY_LENGTH
 )
 from zmon_worker_monitor import plugin_manager
+import importlib
 
 
 ONE_DAY = 24 * 3600
@@ -20,27 +21,27 @@ ONE_DAY = 24 * 3600
 @pytest.fixture(params=[
     (
         {},
-        {i: True for i in xrange(MAX_RESULT_KEYS + 2)}  # keys count violation
+        {i: True for i in range(MAX_RESULT_KEYS + 2)}  # keys count violation
     ),
     (
         {},
-        {i: True for i in xrange(MAX_RESULT_KEYS)}  # size violation
+        {i: True for i in range(MAX_RESULT_KEYS)}  # size violation
     ),
     (
         {},
-        json.dumps({i: True for i in xrange(MAX_RESULT_KEYS)})  # str size violation
+        json.dumps({i: True for i in range(MAX_RESULT_KEYS)})  # str size violation
     ),
     (
         {},
-        [i + 100 for i in xrange(MAX_RESULT_KEYS)]  # list size violation
+        [i + 100 for i in range(MAX_RESULT_KEYS)]  # list size violation
     ),
     (
         {'result.keys.count': 10},
-        {i: True for i in xrange(11)}
+        {i: True for i in range(11)}
     ),
     (
         {'result.size': 1},  # 1KB
-        {i: True for i in xrange(110)}
+        {i: True for i in range(110)}
     )
 ])
 def fx_big_result(request):
@@ -56,7 +57,7 @@ def test_entity_results():
 
 
 def test_timeseries():
-    reload(plugin_manager)
+    importlib.reload(plugin_manager)
     plugin_manager.init_plugin_manager()  # init plugin manager
     plugin_manager.collect_plugins()
 
@@ -98,7 +99,7 @@ def test_alert_series():
 
 
 def test_check(monkeypatch):
-    reload(plugin_manager)
+    importlib.reload(plugin_manager)
     plugin_manager.init_plugin_manager()  # init plugin manager
 
     MainTask.configure({})
@@ -113,7 +114,7 @@ def test_check(monkeypatch):
 def test_check_result_size_violation(monkeypatch, fx_big_result):
     config, result = fx_big_result
 
-    reload(plugin_manager)
+    importlib.reload(plugin_manager)
     plugin_manager.init_plugin_manager()  # init plugin manager
 
     monkeypatch.setattr('zmon_worker_monitor.zmon_worker.tasks.main.MAX_RESULT_SIZE', 2)  # Lower default limit to 2K
@@ -137,7 +138,7 @@ def test_check_result_size_violation(monkeypatch, fx_big_result):
 def test_check_trial_run_result_size_violation(monkeypatch, fx_big_result):
     config, result = fx_big_result
 
-    reload(plugin_manager)
+    importlib.reload(plugin_manager)
     plugin_manager.init_plugin_manager()  # init plugin manager
 
     monkeypatch.setattr('zmon_worker_monitor.zmon_worker.tasks.main.MAX_RESULT_SIZE', 2)  # Lower default limit to 2K
@@ -159,7 +160,7 @@ def test_check_trial_run_result_size_violation(monkeypatch, fx_big_result):
 
 
 def test_evaluate_alert(monkeypatch):
-    reload(plugin_manager)
+    importlib.reload(plugin_manager)
     plugin_manager.init_plugin_manager()  # init plugin manager
     plugin_manager.collect_plugins()
 
@@ -209,7 +210,7 @@ def test_evaluate_downtimes(monkeypatch):
 
 
 def test_notify(monkeypatch):
-    reload(plugin_manager)
+    importlib.reload(plugin_manager)
     plugin_manager.init_plugin_manager()  # init plugin manager
     plugin_manager.collect_plugins()
 
@@ -291,7 +292,7 @@ def test_store_kairosdb(monkeypatch, result, expected):
     (',', {''})
 ))
 def test_main_task_configure_tags(monkeypatch, tags, result):
-    reload(plugin_manager)
+    importlib.reload(plugin_manager)
     plugin_manager.init_plugin_manager()  # init plugin manager
 
     MainTask.configure({'zmon.entity.tags': tags})
@@ -315,7 +316,7 @@ def test_main_task_configure_tags(monkeypatch, tags, result):
     ({'default_sampling': 0, 'critical_checks': [], 'worker_sampling': {'123': 100}}, 11, 60, False, False, True),
 ))
 def test_main_task_sampling(monkeypatch, sampling_config, check_id, interval, is_alert, is_changed, is_sampled):
-    reload(plugin_manager)
+    importlib.reload(plugin_manager)
     plugin_manager.init_plugin_manager()  # init plugin manager
 
     span = MagicMock()
@@ -332,7 +333,7 @@ def test_main_task_sampling(monkeypatch, sampling_config, check_id, interval, is
     ({'default_sampling': 0, 'critical_checks': [], 'worker_sampling': {'123': 10}}, 11, False, False),
 ))
 def test_main_task_sampling_rate(monkeypatch, sampling_config, check_id, is_alert, is_changed):
-    reload(plugin_manager)
+    importlib.reload(plugin_manager)
     plugin_manager.init_plugin_manager()  # init plugin manager
 
     span = MagicMock()

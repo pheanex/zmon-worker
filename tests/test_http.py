@@ -345,8 +345,8 @@ http_request_count{method="post",code="400"}    3 1395066363000
     get.return_value = resp
     monkeypatch.setattr('requests.get', get)
     http = HttpWrapper('http://example.org/prometheus/')
-    expected = {u'http_request_count': [({u'code': u'200', u'method': u'post'}, 1027.0),
-                                        ({u'code': u'400', u'method': u'post'}, 3.0)]}
+    expected = {'http_request_count': [({'code': '200', 'method': 'post'}, 1027.0),
+                                        ({'code': '400', 'method': 'post'}, 3.0)]}
     assert expected == http.prometheus()
 
 
@@ -392,31 +392,31 @@ processors 8.0
     monkeypatch.setattr('requests.get', get)
     http = HttpWrapper('http://example.org/prometheus/')
     expected = {
-        u'jvm_memory_committed_bytes': {
-            u'area.nonheap.id.Code Cache': 1.9070976E7,
-            u'area.nonheap.id.Metaspace': 5.5574528E7,
-            u'area.nonheap.id.Compressed Class Space': 7340032.0,
-            u'area.heap.id.PS Eden Space': 2.84688384E8,
-            u'area.heap.id.PS Survivor Space': 1.6252928E7,
-            u'area.heap.id.PS Old Gen': 2.3855104E8
+        'jvm_memory_committed_bytes': {
+            'area.nonheap.id.Code Cache': 1.9070976E7,
+            'area.nonheap.id.Metaspace': 5.5574528E7,
+            'area.nonheap.id.Compressed Class Space': 7340032.0,
+            'area.heap.id.PS Eden Space': 2.84688384E8,
+            'area.heap.id.PS Survivor Space': 1.6252928E7,
+            'area.heap.id.PS Old Gen': 2.3855104E8
         },
-        u'httpsessions_max': -1.0,
-        u'httpsessions_active': 0.0,
-        u'mem': 370583.0,
-        u'mem_free': 176263.0,
-        u'processors': 8.0,
-        u'http_server_requests_seconds': {
-            u'exception.None.method.GET.quantile.0.95.status.200.uri./api/hello': 0.003080192,
-            u'exception.None.method.GET.quantile.0.99.status.200.uri./api/hello': 0.071237632,
+        'httpsessions_max': -1.0,
+        'httpsessions_active': 0.0,
+        'mem': 370583.0,
+        'mem_free': 176263.0,
+        'processors': 8.0,
+        'http_server_requests_seconds': {
+            'exception.None.method.GET.quantile.0.95.status.200.uri./api/hello': 0.003080192,
+            'exception.None.method.GET.quantile.0.99.status.200.uri./api/hello': 0.071237632,
         },
-        u'http_server_requests_seconds_count': {
-            u'exception.None.method.GET.status.200.uri./api/hello': 20.0
+        'http_server_requests_seconds_count': {
+            'exception.None.method.GET.status.200.uri./api/hello': 20.0
         },
-        u'http_server_requests_seconds_max': {
-            u'exception.None.method.GET.status.200.uri./api/hello': 0.067652582
+        'http_server_requests_seconds_max': {
+            'exception.None.method.GET.status.200.uri./api/hello': 0.067652582
         },
-        u'http_server_requests_seconds_sum': {
-            u'exception.None.method.GET.status.200.uri./api/hello': 0.103182669
+        'http_server_requests_seconds_sum': {
+            'exception.None.method.GET.status.200.uri./api/hello': 0.103182669
         }
     }
     assert expected == http.prometheus_flat()
@@ -464,14 +464,14 @@ processors 8.0
     monkeypatch.setattr('requests.get', get)
     http = HttpWrapper('http://example.org/prometheus/')
     expected = {
-        u'httpsessions_max': -1.0,
-        u'http_server_requests_seconds_sum': {
-            u'exception.None.method.GET.status.200.uri./api/hello': 0.103182669
+        'httpsessions_max': -1.0,
+        'http_server_requests_seconds_sum': {
+            'exception.None.method.GET.status.200.uri./api/hello': 0.103182669
         }
     }
     assert expected == http.prometheus_flat([
-        u'httpsessions_max',
-        u'http_server_requests_seconds_sum.exception.None.method.GET.status.200.uri./api/hello'
+        'httpsessions_max',
+        'http_server_requests_seconds_sum.exception.None.method.GET.status.200.uri./api/hello'
     ])
 
 

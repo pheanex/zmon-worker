@@ -82,7 +82,7 @@ def assert_connect(connect, kwargs):
 
     shard_def = shards.get(shard)
 
-    shard_list = [shard_def] if shard_def else shards.values()
+    shard_list = [shard_def] if shard_def else list(shards.values())
 
     calls = []
     for shard_def in shard_list:

@@ -29,7 +29,7 @@ class ColorGermanyPlugin(IColorPlugin):
                      plugin info file, or passed in the global_config argument to plugin_manager.collect_plugins()
         """
         extra_colors = conf.get('extra_colors', {})
-        for name, (r, g, b) in extra_colors.iteritems():
+        for name, (r, g, b) in extra_colors.items():
             self.color_rgb[name] = (r, g, b)
 
         logger.debug('cool multi-line configuration value: fashion_sites: "%s"', conf.get('fashion_sites', ''))

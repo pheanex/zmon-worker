@@ -25,7 +25,7 @@ class ColorSpainPlugin(IColorPlugin):
         :return:
         """
         extra_colors = conf.get('extra_colors', {})
-        for name, (r, g, b) in extra_colors.iteritems():
+        for name, (r, g, b) in extra_colors.items():
             self.color_rgb[name] = (r, g, b)
 
     def get_season_colors(self):

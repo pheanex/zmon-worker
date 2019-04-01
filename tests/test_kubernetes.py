@@ -11,7 +11,7 @@ def resource_mock(obj, **kwargs):
     resource = MagicMock()
     resource.obj = obj
     resource.ready = True
-    for k, v in kwargs.items():
+    for k, v in list(kwargs.items()):
         setattr(resource, k, v)
 
     return resource

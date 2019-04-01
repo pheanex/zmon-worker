@@ -8,14 +8,12 @@ from abc import ABCMeta, abstractmethod
 import colorsys
 
 
-class IColorPlugin(IBasePlugin):
+class IColorPlugin(IBasePlugin, metaclass=ABCMeta):
 
     """
     Example Base Plugin Interface (Adapter)
     Extend it to create a plugin to deal with trendy fashion colors in a country. :)
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         super(IColorPlugin, self).__init__()
@@ -58,7 +56,7 @@ class IColorPlugin(IBasePlugin):
         best_color = None
         min_dev = 3.0 * 256 * 256
 
-        for name, (cr, cg, cb) in self.color_rgb.iteritems():
+        for name, (cr, cg, cb) in self.color_rgb.items():
             dev = (cr - r)**2 + (cg - g)**2 + (cb - b)**2
             if dev < min_dev:
                 best_color = name

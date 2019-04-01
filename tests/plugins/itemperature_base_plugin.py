@@ -7,15 +7,13 @@ from time import time, sleep
 from threading import Thread
 
 
-class ITemperaturePlugin(IBasePlugin):
+class ITemperaturePlugin(IBasePlugin, metaclass=ABCMeta):
 
     """
     Example Base Plugin Interface (Adapter)
     Extend it to create a plugin that connects to a device to periodically read its temperature.
     Who doesn't have a fully network connected kitchen these days :)
     """
-
-    __metaclass__ = ABCMeta
 
     UNIT_CELSIUS = '_UNIT_CELSIUS_'
     UNIT_FAHRENHEIT = '_UNIT_FAHRENHEIT_'

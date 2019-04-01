@@ -13,7 +13,7 @@ from random import gauss
 import logging
 
 # we can distribute our logic in submodules
-from some_subpkg.dependency01 import Engine
+from .some_subpkg.dependency01 import Engine
 
 logger = logging.getLogger(__name__)
 

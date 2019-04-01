@@ -6,8 +6,8 @@ from mock import MagicMock
 def test_get_details_one_pipeline(monkeypatch):
     client = MagicMock()
     client.describe_pipelines.return_value = {'pipelineDescriptionList': [{'fields': [
-      {u'key': u'@cancelActive',
-       u'stringValue': u'true'},
+      {'key': '@cancelActive',
+       'stringValue': 'true'},
       {'key': '@id',
        'stringValue': 'pipeline_1'},
       {'key': '@accountId',

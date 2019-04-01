@@ -79,13 +79,13 @@ def test_action_decorator(monkeypatch):
     methods2 = process_controller.register.get_registered_by_obj(fib2)
 
     for obj, methods in [(fib1, methods1), (fib2, methods2)]:
-        print '====== methods of {} ======'.format(obj)
+        print('====== methods of {} ======'.format(obj))
         for met in methods:
-            print 'method: {}(), returned: {}'.format(met.__name__, met())
+            print('method: {}(), returned: {}'.format(met.__name__, met()))
 
     # methods with same name are not equal because they are bounded to different instances
-    assert not filter(None, [(met1 == met2 or met1() == met2()) for met1 in methods1 for met2 in methods2
-                             if met1.__name__ == met2.__name__])
+    assert not [_f for _f in [(met1 == met2 or met1() == met2()) for met1 in methods1 for met2 in methods2
+                             if met1.__name__ == met2.__name__] if _f]
 
     #
     # check we can collect methods from different regions and they don't mix
@@ -632,7 +632,7 @@ def test_process_plus_ping_aggregations(monkeypatch):
     assert compare_float_values(pp.aggregate_pings(interval=300), dict_repr['task_counts']['0:05:00'])
 
     # check all persisted aggregations
-    for k, v in dict_repr['task_counts'].items():
+    for k, v in list(dict_repr['task_counts'].items()):
         assert compare_float_values(pp.aggregate_pings(interval=v['interval']), v)
 
     pp.terminate_plus()
@@ -756,7 +756,7 @@ def test_process_plus_event_aggregations(monkeypatch):
     assert pp.aggregate_events(interval=60 * 60 * 24) == dict_repr['event_counts']['1 day, 0:00:00']
 
     # check all persisted aggregations
-    for k, v in dict_repr['event_counts'].items():
+    for k, v in list(dict_repr['event_counts'].items()):
         assert pp.aggregate_events(interval=v['interval']) == v
 
     monkeypatch.undo()

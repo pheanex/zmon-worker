@@ -9,8 +9,9 @@ import time
 
 from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactoryPlugin
 from zmon_worker_monitor import plugin_manager
-from plugins.icolor_base_plugin import IColorPlugin
-from plugins.itemperature_base_plugin import ITemperaturePlugin
+from .plugins.icolor_base_plugin import IColorPlugin
+from .plugins.itemperature_base_plugin import ITemperaturePlugin
+import importlib
 
 
 def simple_plugin_dir_abs_path(*suffixes):
@@ -32,7 +33,7 @@ class TestPluginManager(unittest.TestCase):
         Test that exception is raised if you collect plugins more than once
         """
         # reload the plugin
-        reload(plugin_manager)
+        importlib.reload(plugin_manager)
 
         plugin_manager.init_plugin_manager()  # init plugin manager
 
@@ -46,7 +47,7 @@ class TestPluginManager(unittest.TestCase):
         Test that city plugin can be fully loaded
         """
         # reload the plugin
-        reload(plugin_manager)
+        importlib.reload(plugin_manager)
 
         plugin_manager.init_plugin_manager()  # init the plugin manager
 
@@ -96,7 +97,7 @@ class TestPluginManager(unittest.TestCase):
         for test_load_from in ('env_var', 'additional_folders'):
 
             # reload the plugin
-            reload(plugin_manager)
+            importlib.reload(plugin_manager)
 
             # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
             category_filter = {
@@ -190,7 +191,7 @@ class TestPluginManager(unittest.TestCase):
         Notice we put two folders to ZMON_PLUGINS env var, separated by ':'
         """
         # reload the plugin
-        reload(plugin_manager)
+        importlib.reload(plugin_manager)
 
         # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
         category_filter = {
@@ -243,7 +244,7 @@ class TestPluginManager(unittest.TestCase):
         takes precedence over local config
         """
         # reload the plugin
-        reload(plugin_manager)
+        importlib.reload(plugin_manager)
 
         # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
         category_filter = {
@@ -285,7 +286,7 @@ class TestPluginManager(unittest.TestCase):
             plugin_abs_dir = broken_plugin_dir_abs_path(plugin_dir)
 
             # reload the plugin
-            reload(plugin_manager)
+            importlib.reload(plugin_manager)
 
             # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
             category_filter = {
@@ -319,7 +320,7 @@ class TestPluginManager(unittest.TestCase):
         plugin_abs_dir = broken_plugin_dir_abs_path('plugin_dir_with_requirements')
 
         # reload the plugin
-        reload(plugin_manager)
+        importlib.reload(plugin_manager)
 
         # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
         category_filter = {

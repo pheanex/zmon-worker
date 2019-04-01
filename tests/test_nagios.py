@@ -66,29 +66,29 @@ class TestNagios(unittest.TestCase):
         n = NagiosWrapper('test_host')
         result = n.nrpe('check_load')
 
-        self.assertEquals(len(result), 3, 'Load check should return a dict with 3 items')
+        self.assertEqual(len(result), 3, 'Load check should return a dict with 3 items')
         self.assertIn('load1', result, 'Load check should contain load1 key')
         self.assertIn('load5', result, 'Load check should contain load5 key')
         self.assertIn('load15', result, 'Load check should contain load15 key')
-        self.assertTrue(all(isinstance(v, float) for v in result.itervalues()),
+        self.assertTrue(all(isinstance(v, float) for v in result.values()),
                         'Load check should containt only float values')
 
         result = n.nrpe('check_disk', args=['/'])
 
         self.assertIn('/', result, 'Disk check should contain the mount key')
-        self.assertEquals(8026000, result['/'], 'Disk check should contain the parsed value')
+        self.assertEqual(8026000, result['/'], 'Disk check should contain the parsed value')
 
         result = n.nrpe('check_mailq_postfix')
 
         self.assertIn('unsent', result, 'Mail queue result should contain unsent messages')
-        self.assertEquals(1078, result['unsent'], 'Mail queue check should contain the parsed value')
+        self.assertEqual(1078, result['unsent'], 'Mail queue check should contain the parsed value')
 
     @patch('subprocess32.check_output', mock_ping)
     def test_ping(self):
         n = NagiosWrapper('test_host')
         result = n.local('check_ping')
 
-        self.assertEquals(len(result), 2, 'Ping check should return a dictionary with 2 items')
+        self.assertEqual(len(result), 2, 'Ping check should return a dictionary with 2 items')
         self.assertIn('rta', result, 'Ping check should contain rta key')
         self.assertIn('pl', result, 'Ping check should conain pl key')
 
@@ -97,11 +97,11 @@ class TestNagios(unittest.TestCase):
         n = NagiosWrapper('test_host')
         result = n.local('check_snmp_mem_used-cached.pl')
 
-        self.assertEquals(len(result), 3, 'Snmp memory check should return a dictionary with 3 items')
+        self.assertEqual(len(result), 3, 'Snmp memory check should return a dictionary with 3 items')
         self.assertIn('ram_used', result, 'Snmp memory check should contain ram_used key')
         self.assertIn('cache_used', result, 'Snmp memory check should contain cache_used key')
         self.assertIn('swap_used', result, 'Snmp memory check should contain swap_used key')
-        self.assertTrue(all(isinstance(v, float) for v in result.itervalues()),
+        self.assertTrue(all(isinstance(v, float) for v in result.values()),
                         'Snmp memory check check should containt only float values')
 
     @patch('subprocess32.check_output', mock_win)

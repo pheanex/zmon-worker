@@ -48,7 +48,7 @@ def test_redis_connection_exception(monkeypatch):
 def test_redis_parametrized(monkeypatch, kwargs):
 
     rediswrapper.STATISTIC_COUNTER_KEYS = frozenset()
-    rediswrapper.STATISTIC_GAUGE_KEYS = STATS.keys()
+    rediswrapper.STATISTIC_GAUGE_KEYS = list(STATS.keys())
 
     def get(key):
         if key in STATS:

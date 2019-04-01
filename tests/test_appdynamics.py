@@ -37,7 +37,7 @@ def requests_mock(resp, failure=None):
 
 
 def kwargs_to_params(kwargs, start_time, end_time):
-    res = {k.replace('_', '-'): v for k, v in kwargs.items()}
+    res = {k.replace('_', '-'): v for k, v in list(kwargs.items())}
 
     if not kwargs:
         res['time-range-type'] = BEFORE_NOW
