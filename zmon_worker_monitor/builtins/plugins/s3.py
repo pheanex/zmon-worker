@@ -80,7 +80,8 @@ class S3Wrapper(object):
         :return: an S3FileList object
         """
         paginator = self.__client.get_paginator('list_objects_v2')
-        params = dict(Bucket=bucket_name, Prefix=prefix, PaginationConfig={'MaxItems': max_items})
+        params = dict(Bucket=bucket_name, Prefix=prefix,
+                      PaginationConfig={'MaxItems': max_items})
         if not recursive:
             params['Delimiter'] = '/'
         response = paginator.paginate(**params).build_full_result()
@@ -175,8 +176,7 @@ class S3FileList(object):
             [{'file_name': 'string', 'last_modified': datetime(2015, 1, 15, 14, 34, 56), 'size': 123}, ...]
         """
         if self.__has_contents:
-            return [dict(list(zip(['file_name', 'last_modified', 'size'],
-                             [item['Key'], item['LastModified'], item['Size']])))
-                    for item in self.__response['Contents']]
+            return [dict(list(zip(['file_name', 'last_modified', 'size'], [item['Key'], item['LastModified'],
+                                  item['Size']]))) for item in self.__response['Contents']]
         else:
             return []

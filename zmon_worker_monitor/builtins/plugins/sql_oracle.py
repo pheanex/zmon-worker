@@ -77,7 +77,8 @@ class SqlOracleWrapper(object):
                 self.__conn = self.__cx_Oracle.connect(user, password, self._dsn_tns)
                 self.__cursor = self.__conn.cursor()
             except Exception as e:
-                raise DbError(str(e), operation='Connect to dsn={}'.format(self._dsn_tns)).with_traceback(sys.exc_info()[2])
+                raise DbError(
+                    str(e), operation='Connect to dsn={}'.format(self._dsn_tns)).with_traceback(sys.exc_info()[2])
 
     def execute(self, stmt):
         self._stmt = stmt

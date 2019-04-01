@@ -4,8 +4,7 @@
 import logging
 import requests
 import sys
-import urllib.request, urllib.parse, urllib.error
-import urllib.parse
+import urllib
 import json
 import ssl
 import socket
@@ -205,7 +204,9 @@ class HttpWrapper(object):
             url_parsed = urllib.parse.urlsplit(base_url)
             if url_parsed and url_parsed.username and url_parsed.password:
                 base_url = base_url.replace(
-                    "{0}:{1}@".format(urllib.parse.quote(url_parsed.username), urllib.parse.quote(url_parsed.password)), "")
+                    "{0}:{1}@".format(urllib.parse.quote(url_parsed.username),
+                                      urllib.parse.quote(url_parsed.password)),
+                    "")
                 base_url = base_url.replace("{0}:{1}@".format(url_parsed.username, url_parsed.password), "")
                 basic_auth = (url_parsed.username, url_parsed.password)
             self.clean_url = base_url
@@ -224,9 +225,9 @@ class HttpWrapper(object):
                 else:
                     self.__r = s.post(base_url, params=self.params, timeout=self.timeout, verify=self.verify,
                                       headers=self._headers, auth=basic_auth, data=json.dumps(post_data))
-            except requests.Timeout as e:
+            except requests.Timeout:
                 raise HttpError('timeout', self.clean_url).with_traceback(sys.exc_info()[2])
-            except requests.ConnectionError as e:
+            except requests.ConnectionError:
                 raise HttpError('connection failed', self.clean_url).with_traceback(sys.exc_info()[2])
             except Exception as e:
                 raise HttpError(str(e), self.clean_url).with_traceback(sys.exc_info()[2])

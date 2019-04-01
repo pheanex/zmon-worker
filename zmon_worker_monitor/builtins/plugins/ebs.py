@@ -62,9 +62,8 @@ class EBSSnapshotsList(object):
             [{'id': 'string', 'start_time': datetime(2015, 1, 15, 14, 34, 56), 'size': 123}, ...]
         """
         if self.__has_contents:
-            return [dict(list(zip(['id', 'description', 'size', 'start_time', 'state'],
-                             [item['SnapshotId'], item['Description'], item['VolumeSize'],
-                              item['StartTime'], item['State']])))
+            return [dict(list(zip(['id', 'description', 'size', 'start_time', 'state'], [item['SnapshotId'],
+                                  item['Description'], item['VolumeSize'], item['StartTime'], item['State']])))
                     for item in self.__response['Snapshots']]
         else:
             return []
