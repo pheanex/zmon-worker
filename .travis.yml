@@ -2,7 +2,7 @@ language: python
 cache: "pip"
 sudo: required
 python:
-    - "2.7"
+    - "3.7"
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y libsnappy-dev libev4 libev-dev python-dev freetds-dev
