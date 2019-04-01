@@ -117,4 +117,4 @@ if __name__ == '__main__':
     }
     counter = plugin_manager.get_plugin_obj_by_name('counter', 'Function').create(factory_ctx)
     wrapper = MemcachedWrapper(counter, sys.argv[1])
-    print json.dumps(wrapper.stats(), indent=4, sort_keys=True)
+    print(json.dumps(wrapper.stats(), indent=4, sort_keys=True))

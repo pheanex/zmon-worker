@@ -17,7 +17,7 @@ from smtplib import SMTPAuthenticationError
 
 
 from zmon_worker_monitor.zmon_worker.errors import NotificationError
-from notification import BaseNotification
+from .notification import BaseNotification
 
 
 logger = logging.getLogger(__name__)

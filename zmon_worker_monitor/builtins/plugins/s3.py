@@ -4,7 +4,7 @@
 import boto3
 import json
 import logging
-import cStringIO
+import io
 
 from botocore.exceptions import ClientError
 
@@ -59,7 +59,7 @@ class S3Wrapper(object):
         :param key: the key that identifies the S3 Object within the S3 Bucket
         :return: an S3Object object
         """
-        data = cStringIO.StringIO()
+        data = io.StringIO()
         try:
             self.__client.download_fileobj(bucket_name, key, data)
             result = data.getvalue()
@@ -175,8 +175,8 @@ class S3FileList(object):
             [{'file_name': 'string', 'last_modified': datetime(2015, 1, 15, 14, 34, 56), 'size': 123}, ...]
         """
         if self.__has_contents:
-            return [dict(zip(['file_name', 'last_modified', 'size'],
-                             [item['Key'], item['LastModified'], item['Size']]))
+            return [dict(list(zip(['file_name', 'last_modified', 'size'],
+                             [item['Key'], item['LastModified'], item['Size']])))
                     for item in self.__response['Contents']]
         else:
             return []

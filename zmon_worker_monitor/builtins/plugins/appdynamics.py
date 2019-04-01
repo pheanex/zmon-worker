@@ -198,9 +198,9 @@ class AppdynamicsWrapper(object):
 
             return resp.json()
         except requests.Timeout:
-            raise HttpError('timeout', self.url), None, sys.exc_info()[2]
+            raise HttpError('timeout', self.url).with_traceback(sys.exc_info()[2])
         except requests.ConnectionError:
-            raise HttpError('connection failed', self.url), None, sys.exc_info()[2]
+            raise HttpError('connection failed', self.url).with_traceback(sys.exc_info()[2])
         except Exception:
             logger.exception('AppDynamics request failed')
             raise
@@ -250,9 +250,9 @@ class AppdynamicsWrapper(object):
 
             return json_resp
         except requests.Timeout:
-            raise HttpError('timeout', self.url), None, sys.exc_info()[2]
+            raise HttpError('timeout', self.url).with_traceback(sys.exc_info()[2])
         except requests.ConnectionError:
-            raise HttpError('connection failed', self.url), None, sys.exc_info()[2]
+            raise HttpError('connection failed', self.url).with_traceback(sys.exc_info()[2])
         except Exception:
             logger.exception('AppDynamics request failed')
             raise

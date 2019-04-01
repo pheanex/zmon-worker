@@ -8,7 +8,7 @@ from opentracing_utils import trace, extract_span_from_kwargs
 from zmon_worker_monitor.zmon_worker.common.http import get_user_agent
 from zmon_worker_monitor.zmon_worker.errors import NotificationError
 
-from notification import BaseNotification
+from .notification import BaseNotification
 
 
 logger = logging.getLogger(__name__)

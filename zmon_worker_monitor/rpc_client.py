@@ -27,7 +27,7 @@ To execute the same example from the command line:
 
 import sys
 import json
-import xmlrpclib
+import xmlrpc.client
 from functools import partial
 
 
@@ -48,7 +48,7 @@ class RpcClientPlus(object):
     """
 
     def __init__(self, uri_endpoint, **kwargs):
-        self._client = xmlrpclib.ServerProxy(uri_endpoint, **kwargs)
+        self._client = xmlrpc.client.ServerProxy(uri_endpoint, **kwargs)
 
     def _call_rpc_method(self, method, *args, **kwargs):
         rpc_args = list(args)
@@ -83,7 +83,7 @@ def get_rpc_client(endpoint):
     :param str endpoint: RPC url, example http://host:port/rpc_path
     :return: rpc_client
     """
-    return xmlrpclib.ServerProxy(endpoint)
+    return xmlrpc.client.ServerProxy(endpoint)
 
 
 def get_rpc_client_plus(endpoint):
@@ -122,7 +122,7 @@ def __parse_cmd_line(args):
         try:
             value = eval('{0}({1})'.format(arg_type, arg_value)) if arg_type != 'str' else arg_value
         except Exception:
-            print >> sys.stderr, "\n Error: Detected argument with wrong format"
+            print("\n Error: Detected argument with wrong format", file=sys.stderr)
             sys.exit(3)
 
         cmd_parts['args'].append(value)
@@ -133,17 +133,17 @@ def __parse_cmd_line(args):
 if __name__ == '__main__':
 
     if len(sys.argv) <= 2:
-        print >> sys.stderr, 'usage: {0} http://<host>:<port>/<rpc_path> <method_name> [ [int|float|str]:arg1 ' \
-                             '[int|float|str]:arg2 ...[int|float|str]:argN ...]'.format(sys.argv[0])
+        print('usage: {0} http://<host>:<port>/<rpc_path> <method_name> [ [int|float|str]:arg1 ' \
+                             '[int|float|str]:arg2 ...[int|float|str]:argN ...]'.format(sys.argv[0]), file=sys.stderr)
         sys.exit(1)
 
     cmd_line = __parse_cmd_line(sys.argv[:])
 
     if DEBUG:
-        print 'Parsed cmd_line: ', cmd_line
+        print('Parsed cmd_line: ', cmd_line)
 
     # Executing now the remote method
     client = get_rpc_client_plus(cmd_line['endpoint'])
     result = client.call_rpc_method(cmd_line['method_name'], *cmd_line['args'])
     if result is not None:
-        print ">>Result:\n", result
+        print(">>Result:\n", result)

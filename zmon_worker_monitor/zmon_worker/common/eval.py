@@ -24,7 +24,7 @@ class ProtectedPartial(object):
 
     def __call__(self, *args, **kwargs):
         new_kwargs = self.__partial_kwargs.copy()
-        new_kwargs.update((k, v) for (k, v) in kwargs.iteritems() if k not in self.__protected)
+        new_kwargs.update((k, v) for (k, v) in kwargs.items() if k not in self.__protected)
         return self.__func(*self.__partial_args + args, **new_kwargs)
 
 
@@ -178,7 +178,7 @@ def safe_eval(expr, eval_source='<string>', **kwargs):
             v = {}
             exec (cc, g, v)
             if len(v) == 1:
-                c = v.itervalues().next()
+                c = next(iter(v.values()))
                 if isclass(c):
                     # we need a class instance and not the class itself
                     c = c()

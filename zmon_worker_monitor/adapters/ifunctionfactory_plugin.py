@@ -1,16 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from ibase_plugin import IBasePlugin
+from .ibase_plugin import IBasePlugin
 from abc import ABCMeta, abstractmethod
 
 
-class IFunctionFactoryPlugin(IBasePlugin):
+class IFunctionFactoryPlugin(IBasePlugin, metaclass=ABCMeta):
     """
     Base class for all plugins of type Function. We call it Function adapter.
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         super(IFunctionFactoryPlugin, self).__init__()
@@ -42,7 +40,7 @@ class ProtectedPartial(object):
 
     def __call__(self, *args, **kwargs):
         new_kwargs = self.__partial_kwargs.copy()
-        new_kwargs.update((k, v) for (k, v) in kwargs.iteritems() if k not in self.__protected)
+        new_kwargs.update((k, v) for (k, v) in kwargs.items() if k not in self.__protected)
         return self.__func(*self.__partial_args + args, **new_kwargs)
 
 

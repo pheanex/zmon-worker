@@ -185,9 +185,9 @@ class ElasticsearchWrapper(object):
 
                 return response.json()
         except requests.Timeout:
-            raise HttpError('timeout', self.url), None, sys.exc_info()[2]
+            raise HttpError('timeout', self.url).with_traceback(sys.exc_info()[2])
         except requests.ConnectionError:
-            raise HttpError('connection failed', self.url), None, sys.exc_info()[2]
+            raise HttpError('connection failed', self.url).with_traceback(sys.exc_info()[2])
         except Exception:
             raise
 
@@ -196,9 +196,9 @@ if __name__ == '__main__':
     url = sys.argv[1]
     check = ElasticsearchWrapper(url)
 
-    print(check.search(q='*', source=False))
+    print((check.search(q='*', source=False)))
 
-    print(check.search(size=1, body={
+    print((check.search(size=1, body={
         '_source': False,
         'size': 10000,
         'query': {
@@ -206,6 +206,6 @@ if __name__ == '__main__':
                 'query': '*'
             }
         }
-    }))
+    })))
 
-    print(check.health()['status'])
+    print((check.health()['status']))

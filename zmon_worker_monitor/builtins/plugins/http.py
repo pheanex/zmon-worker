@@ -4,8 +4,8 @@
 import logging
 import requests
 import sys
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 import json
 import ssl
 import socket
@@ -86,7 +86,7 @@ def map_dropwizard_timers(timers, prefix):
     r = {}
 
     start_index = len(prefix.split('.')) - 1
-    for (k, v) in timers.iteritems():
+    for (k, v) in timers.items():
         if k.startswith(prefix):
             ks = k.split('.')
             ks = ks[start_index:]
@@ -103,7 +103,7 @@ def map_dropwizard_timers(timers, prefix):
             if status_code not in r[path][http_method]:
                 r[path][http_method][status_code] = {}
 
-            for (mn, mv) in v.iteritems():
+            for (mn, mv) in v.items():
                 # map Drop Wizard metric names to our canonical ones
                 metric_name = ACTUATOR_METRIC_NAMES.get(mn)
                 if metric_name:
@@ -116,7 +116,7 @@ def map_spring_boot_metrics(j, prefix):
     # process "flat" Spring Boot metrics
     # see https://github.com/zalando/zmon-actuator
     start_index = len(prefix.split('.')) - 1
-    for (k, v) in j.iteritems():
+    for (k, v) in j.items():
         if k.startswith(prefix):
             # dict key "k" looks like:
             # my.prefix.200.GET.my.foo.bar.path.oneMinuteRate
@@ -202,10 +202,10 @@ class HttpWrapper(object):
             base_url = self.url
             basic_auth = None
 
-            url_parsed = urlparse.urlsplit(base_url)
+            url_parsed = urllib.parse.urlsplit(base_url)
             if url_parsed and url_parsed.username and url_parsed.password:
                 base_url = base_url.replace(
-                    "{0}:{1}@".format(urllib.quote(url_parsed.username), urllib.quote(url_parsed.password)), "")
+                    "{0}:{1}@".format(urllib.parse.quote(url_parsed.username), urllib.parse.quote(url_parsed.password)), "")
                 base_url = base_url.replace("{0}:{1}@".format(url_parsed.username, url_parsed.password), "")
                 basic_auth = (url_parsed.username, url_parsed.password)
             self.clean_url = base_url
@@ -224,25 +224,25 @@ class HttpWrapper(object):
                 else:
                     self.__r = s.post(base_url, params=self.params, timeout=self.timeout, verify=self.verify,
                                       headers=self._headers, auth=basic_auth, data=json.dumps(post_data))
-            except requests.Timeout, e:
-                raise HttpError('timeout', self.clean_url), None, sys.exc_info()[2]
-            except requests.ConnectionError, e:
-                raise HttpError('connection failed', self.clean_url), None, sys.exc_info()[2]
-            except Exception, e:
-                raise HttpError(str(e), self.clean_url), None, sys.exc_info()[2]
+            except requests.Timeout as e:
+                raise HttpError('timeout', self.clean_url).with_traceback(sys.exc_info()[2])
+            except requests.ConnectionError as e:
+                raise HttpError('connection failed', self.clean_url).with_traceback(sys.exc_info()[2])
+            except Exception as e:
+                raise HttpError(str(e), self.clean_url).with_traceback(sys.exc_info()[2])
         if raise_error:
             try:
                 self.__r.raise_for_status()
-            except requests.HTTPError, e:
-                raise HttpError(str(e), self.clean_url), None, sys.exc_info()[2]
+            except requests.HTTPError as e:
+                raise HttpError(str(e), self.clean_url).with_traceback(sys.exc_info()[2])
         return self.__r
 
     def json(self, raise_error=True):
         r = self.__request(raise_error=raise_error)
         try:
             return r.json()
-        except Exception, e:
-            raise HttpError(str(e), self.url), None, sys.exc_info()[2]
+        except Exception as e:
+            raise HttpError(str(e), self.url).with_traceback(sys.exc_info()[2])
 
     def jolokia(self, read_requests, raise_error=True):
         '''
@@ -251,16 +251,14 @@ class HttpWrapper(object):
         :param raise_error:
         :return: Jolokia response
         '''
-        def set_read_type(x):
-            x['type'] = 'read'
 
         # hack quick verify
-        parsed_url = urlparse.urlsplit(self.url)
+        parsed_url = urllib.parse.urlsplit(self.url)
         if (not parsed_url.path.endswith('/jolokia/')) or ('?' in self.url) or ('&' in self.url):
             raise HttpError("URL needs to end in /jolokia/ and not contain ? and &", self.url)
 
-        map(set_read_type, read_requests)
         for rr in read_requests:
+            rr['type'] = 'read'
             if 'mbean' not in rr:
                 raise CheckError('missing "mbean" key in read request')
 
@@ -268,8 +266,8 @@ class HttpWrapper(object):
 
         try:
             return r.json()
-        except Exception, e:
-            raise HttpError(str(e), self.url), None, sys.exc_info()[2]
+        except Exception as e:
+            raise HttpError(str(e), self.url).with_traceback(sys.exc_info()[2])
 
     def actuator_metrics(self, prefix='zmon.response.', raise_error=True):
         """
@@ -349,7 +347,7 @@ class HttpWrapper(object):
         return self.__request(raise_error=False).status_code
 
     def certs(self):
-        parse = urlparse.urlparse(self.url)
+        parse = urllib.parse.urlparse(self.url)
 
         if parse.scheme != 'https':
             raise CheckError('Expected "https" connection!')

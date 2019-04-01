@@ -45,4 +45,4 @@ def ping(host, count=1, timeout=1):
 
 if __name__ == '__main__':
     import sys
-    print ping(sys.argv[1])
+    print(ping(sys.argv[1]))

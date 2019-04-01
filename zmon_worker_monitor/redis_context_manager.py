@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from emu_kombu import parse_redis_conn
+from .emu_kombu import parse_redis_conn
 import redis
 import logging
 import time
@@ -87,7 +87,7 @@ class RedisConnHandler(object):
 
         servers = config.get('redis.servers')
         if servers:
-            if isinstance(servers, basestring):
+            if isinstance(servers, str):
                 servers = [s.strip() for s in servers.split(',')]
             elif not isinstance(servers, collections.Iterable):
                 raise Exception("wrong servers parameter")

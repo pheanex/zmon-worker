@@ -14,7 +14,7 @@ from zmon_worker_monitor.zmon_worker.encoder import JsonDataEncoder
 from zmon_worker_monitor.zmon_worker.common.http import get_user_agent
 from zmon_worker_monitor.zmon_worker.errors import NotificationError
 
-from notification import BaseNotification
+from .notification import BaseNotification
 
 PRIORITIES = ('P1', 'P2', 'P3', 'P4', 'P5')
 
@@ -62,7 +62,7 @@ class NotifyOpsgenie(BaseNotification):
             current_span.log_kv({'reason': 'API key is required!'})
             raise NotificationError('API key is required!')
 
-        if not isinstance(teams, (list, basestring)):
+        if not isinstance(teams, (list, str)):
             current_span.set_tag('notification_invalid', True)
             current_span.log_kv({'reason': 'Missing team!'})
             raise NotificationError('Missing "teams" parameter. Either a team name or list of team names is required.')
@@ -74,7 +74,7 @@ class NotifyOpsgenie(BaseNotification):
             current_span.log_kv({'reason': 'Invalid priorities'})
             raise NotificationError('Invalid priority. Valid values are: {}'.format(PRIORITIES))
 
-        if teams and isinstance(teams, basestring):
+        if teams and isinstance(teams, str):
             teams = [{'name': teams}]
         else:
             teams = [{'name': t} for t in teams]

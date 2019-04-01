@@ -124,7 +124,7 @@ class SqlWrapper(object):
         self._stmt = None
         permissions = {}
 
-        for shard_def in ([shards[shard]] if shard else shards.values()):
+        for shard_def in ([shards[shard]] if shard else list(shards.values())):
             m = CONNECTION_RE.match(shard_def)
             if not m:
                 raise CheckError('Invalid shard connection: {}'.format(shard_def))
@@ -146,17 +146,17 @@ class SqlWrapper(object):
                 cursor = conn.cursor(cursor_factory=NamedTupleCursor)
                 cursor.execute("SET statement_timeout TO %s;", [timeout])
                 self._cursors.append(cursor)
-            except Exception, e:
-                raise DbError(str(e), operation='Connect to {}'.format(shard_def)), None, sys.exc_info()[2]
+            except Exception as e:
+                raise DbError(str(e), operation='Connect to {}'.format(shard_def)).with_traceback(sys.exc_info()[2])
             try:
                 if created_by:
                     cursor.execute(PERMISSIONS_STMT, [created_by])
                     row = cursor.fetchone()
                     permissions[shard_def] = (row.can_login and REQUIRED_GROUP in row.member_of if row else False)
-            except Exception, e:
-                raise DbError(str(e), operation='Permission query'), None, sys.exc_info()[2]
+            except Exception as e:
+                raise DbError(str(e), operation='Permission query').with_traceback(sys.exc_info()[2])
 
-        for resource, permitted in permissions.iteritems():
+        for resource, permitted in permissions.items():
             if not permitted:
                 raise InsufficientPermissionsError(created_by, resource)
 
@@ -174,15 +174,15 @@ class SqlWrapper(object):
                     cur.execute(self._stmt)
                     row = cur.fetchone()
                     if row:
-                        for k, v in row._asdict().items():
+                        for k, v in list(row._asdict().items()):
                             result[k] = result.get(k, [])
                             result[k].append(v)
                 finally:
                     cur.close()
-        except Exception, e:
-            raise DbError(str(e), operation=self._stmt), None, sys.exc_info()[2]
+        except Exception as e:
+            raise DbError(str(e), operation=self._stmt).with_traceback(sys.exc_info()[2])
 
-        for k, v in result.items():
+        for k, v in list(result.items()):
             try:
                 result[k] = agg(v)
             except Exception:
@@ -190,7 +190,7 @@ class SqlWrapper(object):
                 # (e.g. if we try to sum strings)
                 result[k] = v
         if len(result) == 1:
-            return result.values()[0]
+            return list(result.values())[0]
         else:
             return result
 
@@ -216,14 +216,14 @@ class SqlWrapper(object):
                         results.append(row._asdict())
                 finally:
                     cur.close()
-        except Exception, e:
-            raise DbError(str(e), operation=self._stmt), None, sys.exc_info()[2]
+        except Exception as e:
+            raise DbError(str(e), operation=self._stmt).with_traceback(sys.exc_info()[2])
         return results
 
 
 if __name__ == '__main__':
     if len(sys.argv) == 4:
         check = SqlWrapper([sys.argv[1] + '/' + sys.argv[2]])
-        print check.execute(sys.argv[3]).result()
+        print(check.execute(sys.argv[3]).result())
     elif len(sys.argv) > 1:
-        print 'sql.py <host> <dbname> <stmt>'
+        print('sql.py <host> <dbname> <stmt>')

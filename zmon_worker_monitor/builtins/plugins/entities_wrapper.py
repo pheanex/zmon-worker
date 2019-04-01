@@ -83,9 +83,9 @@ class EntitiesWrapper(object):
                 raise CheckError(
                     'EntitiesWrapper query failed: {} with status {}:{}'.format(q, response.status_code, response.text))
         except requests.Timeout:
-            raise HttpError('timeout', self.__service_url), None, sys.exc_info()[2]
+            raise HttpError('timeout', self.__service_url).with_traceback(sys.exc_info()[2])
         except requests.ConnectionError:
-            raise HttpError('connection failed', self.__service_url), None, sys.exc_info()[2]
+            raise HttpError('connection failed', self.__service_url).with_traceback(sys.exc_info()[2])
 
     def search_local(self, **kwargs):
         infrastructure_account = kwargs.get('infrastructure_account', self.infrastructure_account)
@@ -114,4 +114,4 @@ if __name__ == '__main__':
 
     wrapper = factory.create({})
 
-    print wrapper().search_all(stack_name='data-service')
+    print(wrapper().search_all(stack_name='data-service'))

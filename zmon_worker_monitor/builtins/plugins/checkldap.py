@@ -144,8 +144,8 @@ class LdapWrapper(object):
                 raise CheckError('LDAP Error: unsupported method exception.')
         except CheckError:
             raise
-        except Exception, e:
-            raise CheckError('Error connecting to LDAP: {}'.format(e)), None, sys.exc_info()[2]
+        except Exception as e:
+            raise CheckError('Error connecting to LDAP: {}'.format(e)).with_traceback(sys.exc_info()[2])
 
     def _search(self, base, fltr, attrs, scope=ldap.SCOPE_SUBTREE):
         return self.session.search(base, fltr, attrs, scope)
@@ -154,8 +154,8 @@ class LdapWrapper(object):
         self.logger.debug('disconnect')
         try:
             self.session.disconnect()
-        except Exception, e:
-            raise CheckError('Error disconnecting to LDAP: {}'.format(e)), None, sys.exc_info()[2]
+        except Exception as e:
+            raise CheckError('Error disconnecting to LDAP: {}'.format(e)).with_traceback(sys.exc_info()[2])
         self.session = None
 
     def _sync_state(self, ldapserver):
@@ -216,7 +216,7 @@ class LdapWrapper(object):
                 start = time.time()
                 csn_list = self._sync_state(ldapserver)
                 rid2ts = {}
-                rid_ts = map(lambda csn: self._get_timestamp_rid(csn), csn_list)
+                rid_ts = [self._get_timestamp_rid(csn) for csn in csn_list]
                 newest = rid_ts[0][1]
                 for rid, ts in rid_ts:
                     rid2ts[rid] = ts
@@ -260,12 +260,12 @@ class LdapWrapper(object):
 
         try:
             rid2url, url2rid = self._get_rid_to_url(self.host)
-            ldapservers = map(lambda url: url[7:], url2rid.keys())
+            ldapservers = [url[7:] for url in list(url2rid.keys())]
             return self._sync(ldapservers)
         except CheckError:
             raise
-        except Exception, e:
-            raise CheckError('{}'.format(e)), None, sys.exc_info()[2]
+        except Exception as e:
+            raise CheckError('{}'.format(e)).with_traceback(sys.exc_info()[2])
 
     def auth(self):
         try:
@@ -291,8 +291,8 @@ class LdapWrapper(object):
             raise CheckError(msg)
         except ldap.CONFIDENTIALITY_REQUIRED:
             return {'ok': False}
-        except Exception, e:
-            raise CheckError('Error authenticating to LDAP: {}'.format(e)), None, sys.exc_info()[2]
+        except Exception as e:
+            raise CheckError('Error authenticating to LDAP: {}'.format(e)).with_traceback(sys.exc_info()[2])
 
     def statistics_raw(self):
         '''collect statistics from OpenLDAP "Monitor" DB as a dict
@@ -357,8 +357,8 @@ class LdapWrapper(object):
             self._disconnect()
         except CheckError:
             raise
-        except Exception, e:
-            raise CheckError('{}'.format(e)), None, sys.exc_info()[2]
+        except Exception as e:
+            raise CheckError('{}'.format(e)).with_traceback(sys.exc_info()[2])
         return data
 
     def statistics(self):
@@ -387,7 +387,7 @@ class LdapWrapper(object):
 
         _data = self.statistics_raw()
         data = {}
-        for key, val in _data.items():
+        for key, val in list(_data.items()):
             if key in STATISTICS_GAUGE_KEYS:
                 data[STATISTICS_FRIENDLY_KEY_NAMES.get(key, key)] = val
             elif key == 'connections_total':
@@ -403,5 +403,5 @@ class LdapWrapper(object):
             self._connect(self.host)
             return self._search(base, fltr, attrs, scope)
 
-        except Exception, e:
+        except Exception as e:
             raise CheckError('Error searching LDAP: {}'.format(e))

@@ -205,6 +205,6 @@ class KairosdbWrapper(object):
                 raise Exception(
                     'KairosDB Query failed: {} with status {}:{}'.format(q, response.status_code, response.text))
         except requests.Timeout:
-            raise HttpError('timeout', self.url), None, sys.exc_info()[2]
+            raise HttpError('timeout', self.url).with_traceback(sys.exc_info()[2])
         except requests.ConnectionError:
-            raise HttpError('connection failed', self.url), None, sys.exc_info()[2]
+            raise HttpError('connection failed', self.url).with_traceback(sys.exc_info()[2])

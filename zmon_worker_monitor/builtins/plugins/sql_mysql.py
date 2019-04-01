@@ -49,12 +49,12 @@ def _import_db_driver():
     for module in module_alternatives:
         try:
             return __import__(module, globals(), locals(), [], -1)
-        except Exception, e:
+        except Exception as e:
             if module == module_alternatives[-1]:
                 raise
             else:
                 # print is well supported by celery, this will end up as a log entry
-                print 'Warning: Import of module {} failed: {}'.format(module, e)
+                print('Warning: Import of module {} failed: {}'.format(module, e))
 
 
 class MySqlWrapper(object):
@@ -86,7 +86,7 @@ class MySqlWrapper(object):
 
         mdb = _import_db_driver()
 
-        for shard_def in ([shards[shard]] if shard else shards.values()):
+        for shard_def in ([shards[shard]] if shard else list(shards.values())):
             m = CONNECTION_RE.match(shard_def)
             if not m:
                 raise CheckError('Invalid shard connection: {}'.format(shard_def))
@@ -94,8 +94,8 @@ class MySqlWrapper(object):
                 conn = mdb.connect(host=m.group('host'), user=user, passwd=password, db=m.group('dbname'),
                                    port=(int(m.group('port')) if int(m.group('port')) > 0 else DEFAULT_PORT),
                                    connect_timeout=timeout)
-            except Exception, e:
-                raise DbError(str(e), operation='Connect to {}'.format(shard_def)), None, sys.exc_info()[2]
+            except Exception as e:
+                raise DbError(str(e), operation='Connect to {}'.format(shard_def)).with_traceback(sys.exc_info()[2])
 
             # TODO: Find a way to enforce readonly=True as it is done in postgres Wrapper
             # TODO: Do we need to set charset="utf8" and use_unicode=True in connection?
@@ -117,15 +117,15 @@ class MySqlWrapper(object):
                     cur.execute(self._stmt)
                     row = cur.fetchone()
                     if row:
-                        for k, v in row.items():
+                        for k, v in list(row.items()):
                             result[k] = result.get(k, [])
                             result[k].append(v)
                 finally:
                     cur.close()
-        except Exception, e:
-            raise DbError(str(e), operation=self._stmt), None, sys.exc_info()[2]
+        except Exception as e:
+            raise DbError(str(e), operation=self._stmt).with_traceback(sys.exc_info()[2])
 
-        for k, v in result.items():
+        for k, v in list(result.items()):
             try:
                 result[k] = agg(v)
             except Exception:
@@ -133,7 +133,7 @@ class MySqlWrapper(object):
                 # (e.g. if we try to sum strings)
                 result[k] = v
         if len(result) == 1:
-            return result.values()[0]
+            return list(result.values())[0]
         else:
             return result
 
@@ -150,8 +150,8 @@ class MySqlWrapper(object):
                         results.append(dict(row))
                 finally:
                     cur.close()
-        except Exception, e:
-            raise DbError(str(e), operation=self._stmt), None, sys.exc_info()[2]
+        except Exception as e:
+            raise DbError(str(e), operation=self._stmt).with_traceback(sys.exc_info()[2])
         return results
 
 
@@ -164,12 +164,12 @@ if __name__ == '__main__':
             shards = {'test': sys.argv[1] + ':' + sys.argv[2] + '/' + sys.argv[3]}
             sql_stmt = sys.argv[6]
         else:
-            print 'executing default statement:', default_sql_stmt
+            print('executing default statement:', default_sql_stmt)
             shards = {'test': sys.argv[1] + ':' + sys.argv[2] + '/' + default_dbname}
             sql_stmt = default_sql_stmt
 
         check = MySqlWrapper(shards, user=sys.argv[4], password=sys.argv[5])
         # print '>>> many results:\n', check.execute(sql_stmt).results()
-        print '>>> one result:\n', check.execute(sql_stmt).result()
+        print('>>> one result:\n', check.execute(sql_stmt).result())
     else:
-        print '{} <host> <port> <dbname> <user> <password> [sql_stmt]'.format(sys.argv[0])
+        print('{} <host> <port> <dbname> <user> <password> [sql_stmt]'.format(sys.argv[0]))

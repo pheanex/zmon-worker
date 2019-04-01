@@ -11,9 +11,9 @@ import warnings
 import requests
 from requests.packages.urllib3.exceptions import SubjectAltNameWarning
 
-import settings
-import plugin_manager
-import rpc_server
+from . import settings
+from . import plugin_manager
+from . import rpc_server
 from .flags import MONITOR_RESTART, MONITOR_KILL_REQ, MONITOR_PING
 from .web_server.start import start_web
 
@@ -73,7 +73,7 @@ def main(args=None):
     process_config(config)
 
     # allow overwritting any configuration setting via env vars
-    for k, v in os.environ.items():
+    for k, v in list(os.environ.items()):
         if k.startswith('WORKER_'):
             config[k.replace("WORKER_", "").replace("_", ".").lower()] = v
 

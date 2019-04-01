@@ -14,7 +14,7 @@ from zmon_worker_monitor.zmon_worker.encoder import JsonDataEncoder
 from zmon_worker_monitor.zmon_worker.common.http import get_user_agent
 from zmon_worker_monitor.zmon_worker.errors import NotificationError
 
-from notification import BaseNotification
+from .notification import BaseNotification
 
 
 logger = logging.getLogger(__name__)

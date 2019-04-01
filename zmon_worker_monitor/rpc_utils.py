@@ -6,9 +6,9 @@ Server module for exposing an rpc interface for clients to remotely control a lo
 
 import inspect
 import json
-import xmlrpclib
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+import xmlrpc.client
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
 
 import logging
 
@@ -83,7 +83,7 @@ def get_rpc_client(endpoint):
     :param endpoint: http://host:port/rpc_path
     :return: rpc_client object
     """
-    return xmlrpclib.ServerProxy(endpoint)
+    return xmlrpc.client.ServerProxy(endpoint)
 
 
 # TODO: move to a method in RpcProxy

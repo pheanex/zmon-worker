@@ -6,11 +6,11 @@ Server module for exposing an rpc interface for clients to remotely control a lo
 
 import sys
 import signal
-import settings
+from . import settings
 
-from process_controller import ProcessController
-import worker
-import rpc_utils
+from .process_controller import ProcessController
+from . import worker
+from . import rpc_utils
 
 from .flags import MONITOR_RESTART, MONITOR_KILL_REQ, MONITOR_PING
 

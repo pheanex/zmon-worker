@@ -41,7 +41,7 @@ class TcpWrapper(object):
                 s.settimeout(self.timeout)
                 try:
                     s.connect((self.host, port))
-                except Exception, e:
+                except Exception as e:
                     results[port] = str(e)
                 else:
                     results[port] = 'OK'
@@ -53,7 +53,7 @@ class TcpWrapper(object):
     def resolve(self, host):
         try:
             result = socket.gethostbyname(host)
-        except Exception, e:
+        except Exception as e:
             result = 'ERROR: ' + str(e)
         return result
 
@@ -61,5 +61,5 @@ class TcpWrapper(object):
 if __name__ == '__main__':
     import sys
     tcp = TcpWrapper(sys.argv[1])
-    print tcp.open(22, 80, 123)
-    print tcp.open(22)
+    print(tcp.open(22, 80, 123))
+    print(tcp.open(22))

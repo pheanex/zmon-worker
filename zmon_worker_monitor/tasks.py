@@ -3,9 +3,9 @@
 
 import logging
 
-from zmon_worker.tasks.main import MainTask
-from zmon_worker.notifications.mail import Mail
-from zmon_worker.notifications.sms import Sms
+from .zmon_worker.tasks.main import MainTask
+from .zmon_worker.notifications.mail import Mail
+from .zmon_worker.notifications.sms import Sms
 
 logger = logging.getLogger(__name__)
 

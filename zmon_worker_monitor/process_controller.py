@@ -86,7 +86,7 @@ class ProcessController(object):
         return True
 
     def list_running(self):
-        return [proc.to_dict(serialize_all=True) for proc in self.proc_group.values()]
+        return [proc.to_dict(serialize_all=True) for proc in list(self.proc_group.values())]
 
     def get_info(self, proc_name):
         """
@@ -167,7 +167,7 @@ class SimpleMethodCacheInMemory(object):
 
     @classmethod
     def make_args_key(cls, args, kwargs):
-        return '{}-{}'.format(args, sorted((k, v) for k, v in kwargs.items()))
+        return '{}-{}'.format(args, sorted((k, v) for k, v in list(kwargs.items())))
 
     def __call__(self, f):
         id_f = id(f)
@@ -466,9 +466,9 @@ class ProcessPlus(Process):
                 'errors': sum_repeats(errors),
             },
             'by_origin': {
-                'events': {origin: sum_repeats(elist) for origin, elist in group_by_origin(all_events).items()},
-                'actions': {origin: sum_repeats(elist) for origin, elist in group_by_origin(actions).items()},
-                'errors': {origin: sum_repeats(elist) for origin, elist in group_by_origin(errors).items()},
+                'events': {origin: sum_repeats(elist) for origin, elist in list(group_by_origin(all_events).items())},
+                'actions': {origin: sum_repeats(elist) for origin, elist in list(group_by_origin(actions).items())},
+                'errors': {origin: sum_repeats(elist) for origin, elist in list(group_by_origin(errors).items())},
             },
         }
 
@@ -490,7 +490,7 @@ class ProcessPlus(Process):
             assert event['type'] in self.event_types, 'Unrecognized event type: {}'.format(event['type'])
             assert event['repeats'] >= 1, 'Not valid repeat number: Must be greater than 1'
             assert set(event.keys()) == set(self._event_template.keys()), 'Malformed data: {}'.format(event)
-            assert not [1 for v in event.values() if v is None], 'event {} with None value is not valid'.format(event)
+            assert not [1 for v in list(event.values()) if v is None], 'event {} with None value is not valid'.format(event)
         except Exception as e:
             self.logger.exception('Bad event: ')
             raise AssertionError(str(e))
@@ -563,7 +563,7 @@ class ProcessPlus(Process):
         self.stats = self._updated_stats()
         d = copy.deepcopy({fn: getattr(self, fn) for fn in self._pack_fields})
         if serialize_all:
-            d = {fn: (self._func2str(v) if callable(v) else v) for fn, v in d.items()}
+            d = {fn: (self._func2str(v) if callable(v) else v) for fn, v in list(d.items())}
         return d
 
     def to_json(self):
@@ -618,7 +618,7 @@ class ProcessGroup(IterableUserDict):
 
     def _v_or_def(self, **kw):
         assert len(kw) == 1, 'Wrong call, example of right use: self._val_or_def(kill_wait=10)'
-        k, v = kw.keys()[0], kw.values()[0]
+        k, v = list(kw.keys())[0], list(kw.values())[0]
         return v if v not in (None, ()) else self._defaults.get(k)
 
     @classmethod
@@ -641,7 +641,7 @@ class ProcessGroup(IterableUserDict):
 
     @property
     def dead_stats(self):
-        return [proc.stats for proc in self.dead_group.values()]
+        return [proc.stats for proc in list(self.dead_group.values())]
 
     def add(self, process):
         self[process.name] = process
@@ -682,7 +682,7 @@ class ProcessGroup(IterableUserDict):
         return n_success == N  # TODO: better return n_success
 
     def get_by_pid(self, pid):
-        for name, proc in self.items():
+        for name, proc in list(self.items()):
             if proc.pid == pid:
                 return proc
         self.logger.warn('pid=%s not found in group %s', pid, self.group_name)
@@ -695,10 +695,10 @@ class ProcessGroup(IterableUserDict):
         return proc
 
     def filtered(self, proc_names=(), pids=(), lambda_proc=None):
-        proc_dict = {proc.name: proc for proc in filter(None, map(self.get_by_name, proc_names))}
-        proc_dict.update({proc.name: proc for proc in filter(None, map(self.get_by_pid, pids))})
+        proc_dict = {proc.name: proc for proc in [_f for _f in map(self.get_by_name, proc_names) if _f]}
+        proc_dict.update({proc.name: proc for proc in [_f for _f in map(self.get_by_pid, pids) if _f]})
         if lambda_proc and callable(lambda_proc):
-            proc_dict.update({proc.name: proc for proc in filter(lambda_proc, self.values())})
+            proc_dict.update({proc.name: proc for proc in filter(lambda_proc, list(self.values()))})
         return proc_dict
 
     def terminate_process(self, proc_name, kill_wait=None):
@@ -718,7 +718,7 @@ class ProcessGroup(IterableUserDict):
             raise
 
     def mark_for_termination(self, proc_names=(), pids=()):
-        for name, proc in self.filtered(proc_names=proc_names, pids=pids).items():
+        for name, proc in list(self.filtered(proc_names=proc_names, pids=pids).items()):
             proc.mark_for_termination()
 
     def add_ping(self, pid, data):
@@ -737,7 +737,7 @@ class ProcessGroup(IterableUserDict):
         running_list = []
         dead_list = []
 
-        for name, proc in self.items() + self.dead_group.items():
+        for name, proc in list(self.items()) + list(self.dead_group.items()):
             plist = running_list if proc.is_alive() else dead_list
             plist.append(proc.to_dict(serialize_all=True))
 
@@ -764,7 +764,7 @@ class ProcessGroup(IterableUserDict):
 
         idle_procs = []
 
-        for name, proc in self.items() + self.dead_group.items():
+        for name, proc in list(self.items()) + list(self.dead_group.items()):
             if proc.ping_status == proc.STATUS_OK_IDLE:  # only alive & monitored procs may have STATUS_OK_IDLE
                 idle_procs.append({'name': name, 'pid': proc.pid})
 
@@ -812,7 +812,7 @@ class ProcessGroup(IterableUserDict):
         return len(self)
 
     def total_monitored_processes(self):
-        return len([name for name, proc in self.items() if proc.is_monitored()])
+        return len([name for name, proc in list(self.items()) if proc.is_monitored()])
 
     def total_dead_processes(self):
         return len(self.dead_group) + self._num_deleted_dead
@@ -820,7 +820,7 @@ class ProcessGroup(IterableUserDict):
     @cache(wait_sec=30)
     def is_healthy(self):
         num_ok, total = 0, 0
-        for name, proc in self.items():
+        for name, proc in list(self.items()):
             if proc.is_monitored():
                 total += 1
                 status = proc.get_ping_status()
@@ -830,7 +830,7 @@ class ProcessGroup(IterableUserDict):
 
     def terminate_many(self, proc_names=(), pids=(), kill_wait=None):
         success = True
-        for name, proc in self.filtered(proc_names=proc_names, pids=pids).items():
+        for name, proc in list(self.filtered(proc_names=proc_names, pids=pids).items()):
             try:
                 self.terminate_process(name, kill_wait=kill_wait)
             except Exception:
@@ -839,9 +839,9 @@ class ProcessGroup(IterableUserDict):
         return success
 
     def terminate_all(self, kill_wait=None):
-        self.terminate_many(proc_names=self.keys(), kill_wait=kill_wait)
+        self.terminate_many(proc_names=list(self.keys()), kill_wait=kill_wait)
         if self.limbo_group:
-            limbo_info = [proc.pid for name, proc in self.limbo_group.items()]
+            limbo_info = [proc.pid for name, proc in list(self.limbo_group.items())]
             self.logger.error('Fatal: processes left in alive in limbo. PIDs: %s', limbo_info)
 
     def respawn_process(self, proc_name, kill_wait=None):
@@ -875,7 +875,7 @@ class ProcessGroup(IterableUserDict):
         """
         action: respond to kill requests terminate marked pid and spawn them again
         """
-        for name, proc in self.items():
+        for name, proc in list(self.items()):
             if not self.stop_action and proc.should_terminate() and proc.has_flag(MONITOR_KILL_REQ):
                 proc.add_event_explicit('ProcessGroup(%s)._action_kill_req' % self.group_name, 'ACTION',
                                         'Kill request received for %s' % name)
@@ -886,7 +886,7 @@ class ProcessGroup(IterableUserDict):
         """
         action: inspect all processes and react to those that died unexpectedly
         """
-        for name, proc in self.items():
+        for name, proc in list(self.items()):
             if not self.stop_action and not proc.is_alive() and proc.has_flag(MONITOR_RESTART):
                 msg = 'Detected abnormal termination of pid: %s ... Restarting' % proc.pid
                 self.logger.warn(msg)
@@ -898,7 +898,7 @@ class ProcessGroup(IterableUserDict):
         """
         Clean limbo procs
         """
-        for name, proc in self.limbo_group.items():
+        for name, proc in list(self.limbo_group.items()):
             if self.stop_action:
                 break
             if proc.is_alive():
@@ -915,7 +915,7 @@ class ProcessGroup(IterableUserDict):
         """
         num_eliminate = len(self.dead_group) - self._num_keep_dead
         if num_eliminate > 0:
-            t_p = sorted([(proc.start_time, name) for name, proc in self.dead_group.items()])
+            t_p = sorted([(proc.start_time, name) for name, proc in list(self.dead_group.items())])
             names_eliminate = [tp[1] for tp in t_p[0:num_eliminate]]
             for name in names_eliminate:
                 self.dead_group.pop(name, None)

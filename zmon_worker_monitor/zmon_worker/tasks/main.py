@@ -13,7 +13,7 @@ import socket
 import sys
 import traceback
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from urllib3.util import parse_url
 import math
 import numpy
@@ -245,7 +245,7 @@ def _get_shards(entity):
 
 
 def entity_values(con, check_id, alert_id, count=1):
-    return map(get_value, entity_results(con, check_id, alert_id, count))
+    return list(map(get_value, entity_results(con, check_id, alert_id, count)))
 
 
 def entity_results(con, check_id, alert_id, count=1):
@@ -287,7 +287,7 @@ def capture(value=None, captures=None, **kwargs):
     if kwargs:
         if len(kwargs) > 1:
             raise ValueError('Only one named capture supported')
-        key, value = kwargs.items()[0]
+        key, value = list(kwargs.items())[0]
     else:
         i = 1
         while True:
@@ -342,7 +342,7 @@ def _inject_alert_parameters(alert_parameters, ctx):
     params = {}
 
     if alert_parameters:
-        for apname, apdata in alert_parameters.items():
+        for apname, apdata in list(alert_parameters.items()):
             if apname in ctx:
                 raise Exception('Parameter name: %s clashes in context', apname)
             value = _parse_alert_parameter_value(apdata)
@@ -373,7 +373,7 @@ def alert_series(f, n, con, check_id, entity_id):
             v = v['value']
             r = 1 if f(v) else 0
             x = 0
-        except Exception, e:
+        except Exception as e:
             r = 1
             x = 1
             exceptions.append(e)
@@ -492,7 +492,7 @@ def _time_slice(time_spec, results):
         return results
     get_ts = itemgetter('ts')
     results.sort(key=get_ts)
-    keys = map(get_ts, results)
+    keys = list(map(get_ts, results))
     td = parse_timedelta(time_spec)
     last = results[-1]
     needle = last['ts'] - td.total_seconds()
@@ -620,16 +620,16 @@ class Try(Callable):
     def __call__(self, *args):
         try:
             return self.try_call()
-        except self.exc_cls, e:
+        except self.exc_cls as e:
             return self.except_call(e)
 
 
 def get_results_user(count=1, con=None, check_id=None, entity_id=None):
-    return map(lambda x: x['value'], get_results(con, check_id, entity_id, count))
+    return [x['value'] for x in get_results(con, check_id, entity_id, count)]
 
 
 def get_results(con, check_id, entity_id, count=1):
-    r = map(json.loads, con.lrange('zmon:checks:{}:{}'.format(check_id, entity_id), 0, count - 1))
+    r = list(map(json.loads, con.lrange('zmon:checks:{}:{}'.format(check_id, entity_id), 0, count - 1)))
 
     for x in r:
         x.update({'entity_id': entity_id})
@@ -670,11 +670,11 @@ def urlparse(url):
 
 
 def check_filter_metric(metric, keep):
-    return dict((k, v) for k, v in metric.items() if k in keep)
+    return dict((k, v) for k, v in list(metric.items()) if k in keep)
 
 
 def check_filter_metrics(metrics, keep):
-    return dict((k, check_filter_metric(t, keep)) for k, t in metrics.items())
+    return dict((k, check_filter_metric(t, keep)) for k, t in list(metrics.items()))
 
 
 def jsonpath_flat_filter(obj, path):
@@ -695,7 +695,7 @@ def build_default_context():
         'all': all,
         'any': any,
         'avg': avg,
-        'basestring': basestring,
+        'basestring': str,
         'bin': bin,
         'bool': bool,
         'chain': itertools.chain,
@@ -720,7 +720,7 @@ def build_default_context():
         'jsonpath_parse': jsonpath_rw.parse,
         'len': len,
         'list': list,
-        'long': long,
+        'long': int,
         'map': map,
         'math': math,
         'max': max,
@@ -745,8 +745,8 @@ def build_default_context():
         'True': True,
         'Try': Try,
         'tuple': tuple,
-        'unichr': unichr,
-        'unicode': unicode,
+        'unichr': chr,
+        'unicode': str,
         'urlparse': urlparse,
         'xrange': xrange,
         'zip': zip,
@@ -842,7 +842,7 @@ class MainTask(object):
         if (config.get('metriccache.check.id', 0) != 0):
             metric_cache_check_ids.append(config.get('metriccache.check.id'))
 
-        cls._metric_cache_check_ids = map(int, filter(None, metric_cache_check_ids))
+        cls._metric_cache_check_ids = list(map(int, [_f for _f in metric_cache_check_ids if _f]))
 
         # Check result history size
         cls.max_result_history_size = min(
@@ -899,7 +899,7 @@ class MainTask(object):
         if now > self._last_metrics_sent + METRICS_INTERVAL:
             p = self.con.pipeline()
             p.sadd('zmon:metrics', self.worker_name)
-            for key, val in self._counter.items():
+            for key, val in list(self._counter.items()):
                 p.incrby('zmon:metrics:{}:{}'.format(self.worker_name, key), val)
             p.set('zmon:metrics:{}:ts'.format(self.worker_name), now)
             p.execute()
@@ -934,7 +934,7 @@ class MainTask(object):
                 results_by_id[cr['check_id']].append(cr)
 
             # make separate posts per check_id
-            for check_id, results in results_by_id.items():
+            for check_id, results in list(results_by_id.items()):
 
                 # Which span to pickup from all the results?! - we start a fresh span for this check results list!
                 current_span = opentracing.tracer.start_span(operation_name='send_to_dataservice')
@@ -942,7 +942,7 @@ class MainTask(object):
                 with current_span:
 
                     url = '{url}/api/v2/data/{account}/{check_id}/{region}'.format(url=cls._dataservice_url,
-                                                                                   account=urllib.quote(account),
+                                                                                   account=urllib.parse.quote(account),
                                                                                    check_id=check_id,
                                                                                    region=region)
                     worker_result = {
@@ -1038,11 +1038,11 @@ class MainTask(object):
         #     self.con.connection_pool.disconnect()
         #     notify(check_and_notify, {'ts': start_time, 'td': soft_time_limit, 'value': str(e)}, req, alerts,
         #            force_alert=True)
-        except CheckError, e:
+        except CheckError as e:
             self.notify({'ts': start_time, 'td': time.time() - start_time, 'value': str(e), 'worker': self.worker_name,
                          'exc': 1}, req, alerts,
                         force_alert=True)
-        except SecurityError, e:
+        except SecurityError as e:
             self.logger.exception('Security exception in request with id %s on entity %s', check_id, entity_id)
             current_span.set_tag('security_exception', True)
             current_span.log_kv({'exception': str(e)})
@@ -1052,7 +1052,7 @@ class MainTask(object):
                     'exc': 1
                 },
                 req, alerts, force_alert=True)
-        except Exception, e:
+        except Exception as e:
             # self.logger.exception('Check request with id %s on entity %s threw an exception', check_id, entity_id)
             # PF-3685 Disconnect on unknown exceptions: we don't know what actually happened, it might be that redis
             # connection is dirty. CheckError exception is "safe", it's thrown by the worker whenever the check returns
@@ -1085,15 +1085,15 @@ class MainTask(object):
         #     trial_run.con.connection_pool.disconnect()
         #     notify_for_trial_run(trial_run, {'ts': start_time, 'td': soft_time_limit, 'value': str(e)}, req, alerts,
         #                          force_alert=True)
-        except InsufficientPermissionsError, e:
+        except InsufficientPermissionsError as e:
             self.logger.info('Access denied for user %s to run check on %s', req['created_by'], entity_id)
             self.notify_for_trial_run({'ts': start_time, 'td': time.time() - start_time, 'value': str(e)}, req,
                                       alerts, force_alert=True)
-        except CheckError, e:
+        except CheckError as e:
             self.logger.warn('Trial run on entity %s failed. Output: %s', entity_id, str(e))
             self.notify_for_trial_run({'ts': start_time, 'td': time.time() - start_time, 'value': str(e)}, req,
                                       alerts, force_alert=True)
-        except Exception, e:
+        except Exception as e:
             self.logger.exception('Trial run on entity %s threw an exception', entity_id)
             self.con.connection_pool.disconnect()
             self.notify_for_trial_run({'ts': start_time, 'td': time.time() - start_time, 'value': str(e)}, req,
@@ -1207,7 +1207,7 @@ class MainTask(object):
         value = 'NONE'
         try:
             value = json.dumps(result, cls=JsonDataEncoder)
-        except Exception, e:
+        except Exception as e:
             self.logger.exception('failed to serialize check result for check %s', req['check_id'])
             value = 'Serialization error: {}'.format(e)
         self.con.lpush(key, value)
@@ -1215,7 +1215,7 @@ class MainTask(object):
 
     def _check_result_limit(self, result):
         if isinstance(result, dict):
-            key_count = len(flatten(result).keys())
+            key_count = len(list(flatten(result).keys()))
             if key_count > self.max_result_keys:
                 raise ResultSizeError(
                     'Result keys count ({}) exceeded the maximum value: {}'.format(key_count, self.max_result_keys))
@@ -1223,7 +1223,7 @@ class MainTask(object):
         result_str = ''
         try:
             result_str = json.dumps(result, separators=(',', ':'), cls=JsonDataEncoder)
-        except Exception, e:
+        except Exception as e:
             self.logger.exception('failed to serialize check result')
             result_str = 'Serialization error: {}'.format(e)
 
@@ -1244,7 +1244,7 @@ class MainTask(object):
             setp(req['check_id'], req['entity']['id'], 'start')
             res = self._get_check_result(req)
             setp(req['check_id'], req['entity']['id'], 'done')
-        except Exception, e:
+        except Exception as e:
             # PF-3778 Always store check results and re-raise exception which will be handled in 'check_and_notify'.
             self._store_check_result(
                 req, {
@@ -1313,11 +1313,11 @@ class MainTask(object):
             result = safe_eval(cmd, eval_source='<check-command>', **ctx)
             return result() if isinstance(result, Callable) else result
 
-        except (SyntaxError, InvalidEvalExpression), e:
+        except (SyntaxError, InvalidEvalExpression) as e:
             raise CheckError(str(e))
-        except (SecurityError, InsufficientPermissionsError), e:
+        except (SecurityError, InsufficientPermissionsError) as e:
             raise(e)
-        except Exception, e:
+        except Exception as e:
             raise Exception(traceback.format_exc())
 
     def _get_check_result(self, req):
@@ -1340,9 +1340,9 @@ class MainTask(object):
             try:
                 # TODO: either implement SCM command loading or remove all related code
                 scm_commands = []  # self.load_scm_commands(self._safe_repositories)
-            except Exception, e:
+            except Exception as e:
                 traceback = sys.exc_info()[2]
-                raise SecurityError('Unexpected Internal error: {}'.format(e)), None, traceback
+                raise SecurityError('Unexpected Internal error: {}'.format(e)).with_traceback(traceback)
 
             if req['command'] not in scm_commands:
                 raise SecurityError('Security violation: Non-authorized command received in secure environment')
@@ -1356,8 +1356,8 @@ class MainTask(object):
                 # secure_host = '{}.pp'.format(req['entity']['host'][3:])
                 secure_host = '{}.{}'.format(req['entity']['host'][len(prefix):], prefix[:-1])
                 # relplace all real host values occurrences with secure_host
-                req['entity'].update({k: v.replace(real_host, secure_host) for k, v in req['entity'].items() if
-                                      isinstance(v, basestring) and real_host in v and k != 'id'})
+                req['entity'].update({k: v.replace(real_host, secure_host) for k, v in list(req['entity'].items()) if
+                                      isinstance(v, str) and real_host in v and k != 'id'})
 
                 self.logger.warn('secure req[entity] after pp- transformations: %s', req['entity'])
 
@@ -1394,7 +1394,7 @@ class MainTask(object):
         ctx['entity'] = entity
 
         # populate check context with functions from plugins' function factories
-        for func_name, func_factory in self._function_factories.items():
+        for func_name, func_factory in list(self._function_factories.items()):
             if func_name not in ctx:
                 ctx[func_name] = func_factory.create(factory_ctx)
         return ctx
@@ -1436,7 +1436,7 @@ class MainTask(object):
 
             flat_result = flatten(result['value'])
 
-            for k, v in flat_result.iteritems():
+            for k, v in flat_result.items():
 
                 try:
                     v = float(v)
@@ -1496,7 +1496,7 @@ class MainTask(object):
                                                                                    req['entity'],
                                                                                    captures,
                                                                                    alert_parameters))
-        except Exception, e:
+        except Exception as e:
             captures['exception'] = traceback.format_exc()
             result = True
 
@@ -1505,7 +1505,7 @@ class MainTask(object):
             if alert_result is None:
                 raise AlertError('Alert result cannot be None. Please return either True or False')
             is_alert = bool(alert_result)
-        except Exception, e:
+        except Exception as e:
             captures['exception'] = str(e)
             is_alert = True
 
@@ -1513,8 +1513,8 @@ class MainTask(object):
         if alert_parameters:
             pure_captures = captures.copy()
             try:
-                captures = {k: p['value'] for k, p in alert_parameters.items()}
-            except Exception, e:
+                captures = {k: p['value'] for k, p in list(alert_parameters.items())}
+            except Exception as e:
                 self.logger.exception('Error when capturing parameters: ')
             captures.update(pure_captures)
 
@@ -1617,9 +1617,9 @@ class MainTask(object):
                 # the remaining alert definitions.
                 try:
                     is_in_period = in_period(alert.get('period', ''))
-                except InvalidFormat, e:
+                except InvalidFormat as e:
                     self.logger.warn('Alert with id %s has malformed time period.', alert_id)
-                    captures['exception'] = '; \n'.join(filter(None, [captures.get('exception'), str(e)]))
+                    captures['exception'] = '; \n'.join([_f for _f in [captures.get('exception'), str(e)] if _f])
                     is_in_period = True
 
                 if changed and is_in_period and is_alert:
@@ -1634,7 +1634,7 @@ class MainTask(object):
                 capt_json = {}
                 try:
                     capt_json = json.dumps(captures, cls=JsonDataEncoder)
-                except Exception, e:
+                except Exception as e:
                     self.logger.exception('failed to serialize captures')
                     current_span.log_kv({'exception': traceback.format_exc()})
                     captures = {'exception': str(e)}
@@ -1688,7 +1688,7 @@ class MainTask(object):
                         alert_json = None
                         try:
                             alert_json = json.dumps(alert_stored, cls=JsonDataEncoder)
-                        except Exception, e:
+                        except Exception as e:
                             self.logger.exception('failed to serialize alert data for alert %s', alert_id)
                             alert_json = 'failed to serialize: {}'.format(e)
                             if isinstance(captures, dict) and 'exception' not in captures:
@@ -1832,10 +1832,10 @@ class MainTask(object):
 
             try:
                 is_in_period = in_period(alert.get('period', ''))
-            except InvalidFormat, e:
+            except InvalidFormat as e:
                 current_span.set_tag('invalid_timeperiod', True)
                 self.logger.warn('Alert with id %s has malformed time period.', alert['id'])
-                captures['exception'] = '; \n'.join(filter(None, [captures.get('exception'), str(e)]))
+                captures['exception'] = '; \n'.join([_f for _f in [captures.get('exception'), str(e)] if _f])
                 is_in_period = True
 
             try:
@@ -1847,7 +1847,7 @@ class MainTask(object):
                     'in_period': is_in_period,
                 }
                 result_json = json.dumps(result, cls=JsonDataEncoder)
-            except TypeError, e:
+            except TypeError as e:
                 current_span.log_kv({'exception': traceback.format_exc()})
                 current_span.set_tag('error', True)
                 result = {
@@ -1882,12 +1882,12 @@ class MainTask(object):
         redis_entities, redis_downtimes = p.execute()
 
         try:
-            downtimes = dict((k, json.loads(v)) for (k, v) in redis_downtimes.iteritems())
-        except ValueError, e:
+            downtimes = dict((k, json.loads(v)) for (k, v) in redis_downtimes.items())
+        except ValueError as e:
             self.logger.exception(e)
         else:
             now = time.time()
-            for uuid, d in downtimes.iteritems():
+            for uuid, d in downtimes.items():
                 # PF-3604 First check if downtime is active, otherwise check if it's expired, else: it's a
                 # future downtime.
                 try:

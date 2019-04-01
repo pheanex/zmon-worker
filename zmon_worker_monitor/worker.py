@@ -4,15 +4,16 @@ Execution script
 """
 import logging
 from opentracing_utils import init_opentracing_tracer, trace_requests
+import importlib
 
 trace_requests()  # noqa
 
-import settings
+from . import settings
 
 
 def _set_logging(log_conf):
     import logging
-    reload(logging)  # prevents process freeze when logging._lock is acquired by the parent process when fork starts
+    importlib.reload(logging)  # prevents process freeze when logging._lock is acquired by the parent process when fork starts
     import logging.config
     logging.config.dictConfig(log_conf)
 
@@ -30,6 +31,6 @@ def start_worker(**kwargs):
 
     init_opentracing_tracer(kwargs.pop('tracer', None), tags=kwargs.pop('tracer_tags', {}))
 
-    import workflow
+    from . import workflow
 
     workflow.start_worker_for_queue(**kwargs)

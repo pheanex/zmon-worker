@@ -76,8 +76,8 @@ class SqlOracleWrapper(object):
                 self._dsn_tns = self.__cx_Oracle.makedsn(host, port, sid)
                 self.__conn = self.__cx_Oracle.connect(user, password, self._dsn_tns)
                 self.__cursor = self.__conn.cursor()
-            except Exception, e:
-                raise DbError(str(e), operation='Connect to dsn={}'.format(self._dsn_tns)), None, sys.exc_info()[2]
+            except Exception as e:
+                raise DbError(str(e), operation='Connect to dsn={}'.format(self._dsn_tns)).with_traceback(sys.exc_info()[2])
 
     def execute(self, stmt):
         self._stmt = stmt
@@ -95,14 +95,14 @@ class SqlOracleWrapper(object):
                     desc = [d[0] for d in cur.description]  # Careful: col names come out all uppercase
                     row = cur.fetchone()
                     if row:
-                        result = dict(zip(desc, row))
+                        result = dict(list(zip(desc, row)))
                 finally:
                     cur.close()
-        except Exception, e:
-            raise DbError(str(e), operation=self._stmt), None, sys.exc_info()[2]
+        except Exception as e:
+            raise DbError(str(e), operation=self._stmt).with_traceback(sys.exc_info()[2])
 
         if len(result) == 1:
-            return result.values()[0]
+            return list(result.values())[0]
         else:
             return result
 
@@ -118,12 +118,12 @@ class SqlOracleWrapper(object):
                     desc = [d[0] for d in cur.description]  # Careful: col names come out all uppercase
                     rows = cur.fetchmany(MAX_RESULTS)
                     for row in rows:
-                        row = dict(zip(desc, row))
+                        row = dict(list(zip(desc, row)))
                         results.append(row)
                 finally:
                     cur.close()
-        except Exception, e:
-            raise DbError(str(e), operation=self._stmt), None, sys.exc_info()[2]
+        except Exception as e:
+            raise DbError(str(e), operation=self._stmt).with_traceback(sys.exc_info()[2])
         return results
 
 
@@ -136,10 +136,10 @@ if __name__ == '__main__':
         if len(sys.argv) == 7:
             sql_stmt = sys.argv[6]
         else:
-            print 'executing default statement:', default_sql_stmt
+            print('executing default statement:', default_sql_stmt)
             sql_stmt = default_sql_stmt
 
         # print '>>> one result:\n', check.execute(sql_stmt).result()
-        print '>>> many results:\n', check.execute(sql_stmt).results()
+        print('>>> many results:\n', check.execute(sql_stmt).results())
     else:
-        print '{} <host> <port> <sid> [sql_stmt]'.format(sys.argv[0])
+        print('{} <host> <port> <sid> [sql_stmt]'.format(sys.argv[0]))

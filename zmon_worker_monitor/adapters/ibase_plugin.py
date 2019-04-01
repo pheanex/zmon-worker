@@ -4,12 +4,10 @@
 from abc import ABCMeta, abstractmethod
 
 
-class IBasePlugin(object):
+class IBasePlugin(object, metaclass=ABCMeta):
     """
     Base class for all adapters (plugin types). Users should not extend this class directly.
     """
-
-    __metaclass__ = ABCMeta
 
     def __init__(self):
         """

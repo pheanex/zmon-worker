@@ -41,7 +41,7 @@ class DnsWrapper(object):
 
         try:
             result = socket.gethostbyname(host)
-        except Exception, e:
+        except Exception as e:
             result = 'ERROR: ' + str(e)
         return result
 

@@ -10,7 +10,7 @@ from zmon_worker_monitor.zmon_worker.encoder import JsonDataEncoder
 from zmon_worker_monitor.zmon_worker.errors import NotificationError
 from zmon_worker_monitor.zmon_worker.common.http import is_absolute_http_url, get_user_agent
 
-from notification import BaseNotification
+from .notification import BaseNotification
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ class NotifyHttp(BaseNotification):
         current_span.set_tag('alert_changed', bool(is_changed))
         current_span.set_tag('is_alert', is_alert)
 
-        if isinstance(urls, basestring):
+        if isinstance(urls, str):
             urls = urls.replace(' ', '').split(',')
 
         if not url and not default_url:

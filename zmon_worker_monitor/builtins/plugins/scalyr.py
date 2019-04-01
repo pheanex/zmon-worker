@@ -178,4 +178,4 @@ if __name__ == '__main__':
     import os
 
     s = ScalyrWrapper(read_key=os.getenv('SCALYR_READ_KEY'))
-    print(s.count(query='$application_id="zmon-scheduler"'))
+    print((s.count(query='$application_id="zmon-scheduler"')))

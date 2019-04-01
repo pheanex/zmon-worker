@@ -1,5 +1,5 @@
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import json
 import traceback
 
@@ -9,7 +9,7 @@ from urllib2 import urlparse
 
 from opentracing_utils import trace, extract_span_from_kwargs
 
-from notification import BaseNotification
+from .notification import BaseNotification
 
 logger = logging.getLogger(__name__)
 
@@ -63,10 +63,10 @@ class NotifyHipchat(BaseNotification):
 
         try:
             logger.info(
-                'Sending to: ' + '{}/v2/room/{}/notification?auth_token={}'.format(url, urllib.quote(kwargs['room']),
+                'Sending to: ' + '{}/v2/room/{}/notification?auth_token={}'.format(url, urllib.parse.quote(kwargs['room']),
                                                                                    token) + ' ' + json.dumps(message))
             r = requests.post(
-                '{}/v2/room/{}/notification'.format(url, urllib.quote(kwargs['room'])),
+                '{}/v2/room/{}/notification'.format(url, urllib.parse.quote(kwargs['room'])),
                 json=message, params={'auth_token': token}, headers={'Content-type': 'application/json'})
             r.raise_for_status()
         except Exception:

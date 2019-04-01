@@ -24,8 +24,8 @@ def flatten(structure, key='', path='', flattened=None):
     else:
         #        for i, item in enumerate(structure):
         #            flatten(item, '%d' % i, '.'.join(filter(None, [path, key])), flattened)
-        for new_key, value in structure.items():
-            flatten(value, new_key, '.'.join(filter(None, [path, key])), flattened)
+        for new_key, value in list(structure.items()):
+            flatten(value, new_key, '.'.join([_f for _f in [path, key] if _f]), flattened)
     return flattened
 
 
@@ -110,7 +110,7 @@ class DistanceWrapper(object):
         # see https://en.wikipedia.org/wiki/Variance#Basic_properties for details, keep in mind that
         # the different times are uncorrelated. We assume that the sample sizes for the different weeks
         # are equal (since we do not get exact sample sizes for a specific key from the kairosdb)
-        return numpy.sqrt(numpy.sum(map(lambda x: x * x, deviations)))
+        return numpy.sqrt(numpy.sum([x * x for x in deviations]))
 
     def absolute(self, value):
         '''

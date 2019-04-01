@@ -22,15 +22,15 @@ import opentracing
 import requests
 import tokens
 
-import settings
+from . import settings
 
-from rpc_client import get_rpc_client
+from .rpc_client import get_rpc_client
 from zmon_worker_monitor import eventloghttp
 from zmon_worker_monitor.zmon_worker.common.tracing import extract_tracing_span
 
-from redis_context_manager import RedisConnHandler
-from tasks import configure_tasks
-from tasks import check_and_notify, trial_run, cleanup
+from .redis_context_manager import RedisConnHandler
+from .tasks import configure_tasks
+from .tasks import check_and_notify, trial_run, cleanup
 
 
 logger = logging.getLogger(__name__)
@@ -410,7 +410,7 @@ class FlowControlReactor(object):
 
     def action_hard_kill(self):
         """ hard kill logic """
-        for th_name, (taskname, t_hard, t_soft, ts) in self._current_task_by_thread.copy().items():
+        for th_name, (taskname, t_hard, t_soft, ts) in list(self._current_task_by_thread.copy().items()):
             if time.time() > ts + t_hard:
                 msg = 'Hard Kill request started for worker pid=%s, task: %s, t_hard=%d' % (self._pid, taskname, t_hard)
                 logger.warn(msg)
@@ -463,7 +463,7 @@ class FlowControlReactor(object):
                 else:
                     event_dict[key] = e
 
-            events = sorted(event_dict.values(), key=itemgetter('timestamp'))
+            events = sorted(list(event_dict.values()), key=itemgetter('timestamp'))
             if events:
                 self._rpc_client.add_events(self._pid, events)  # rpc call to send events to parent
             self._t_last_events = t_now

@@ -7,7 +7,7 @@ import traceback
 
 from opentracing_utils import trace, extract_span_from_kwargs
 
-from notification import BaseNotification
+from .notification import BaseNotification
 
 logger = logging.getLogger(__name__)
 

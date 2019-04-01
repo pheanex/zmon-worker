@@ -61,7 +61,7 @@ def apply_aggregate_function(results, func, key=functional.id, **args):
     1.8
     '''
 
-    return func(map(key, results), **args)
+    return func(list(map(key, results)), **args)
 
 
 def delta(results):

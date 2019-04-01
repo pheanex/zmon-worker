@@ -1,4 +1,4 @@
-import Queue
+import queue
 import logging
 import random
 import threading
@@ -22,8 +22,8 @@ def flatten(structure, key='', path='', flattened=None):
     if not isinstance(structure, dict):
         flattened[((path + '.' if path else '')) + key] = structure
     else:
-        for new_key, value in structure.items():
-            flatten(value, new_key, '.'.join(filter(None, [path, key])), flattened)
+        for new_key, value in list(structure.items()):
+            flatten(value, new_key, '.'.join([_f for _f in [path, key] if _f]), flattened)
     return flattened
 
 
@@ -32,13 +32,13 @@ class PeriodicBufferedAction(object):
         self.log = logging.getLogger(__name__)
         self._stop = True
         self.action = action
-        self.action_name = action_name if action_name else (action.func_name if hasattr(action, 'func_name') else
+        self.action_name = action_name if action_name else (action.__name__ if hasattr(action, 'func_name') else
                                                             (action.__name__ if hasattr(action, '__name__') else None))
         self.retries = retries
         self.t_wait = t_wait
         self.t_rand_fraction = t_random_fraction
 
-        self._queue = Queue.Queue()
+        self._queue = queue.Queue()
         self._thread = threading.Thread(target=self._loop)
         self._thread.daemon = True
 
@@ -63,7 +63,7 @@ class PeriodicBufferedAction(object):
         }
         try:
             self._queue.put_nowait(elem)
-        except Queue.Full:
+        except queue.Full:
             self.log.exception('Fatal Error: is worker out of memory? Details: ')
 
     def _collect_from_queue(self):
@@ -73,7 +73,7 @@ class PeriodicBufferedAction(object):
         while not empty and not self._stop:
             try:
                 elem_list.append(self._queue.get_nowait())
-            except Queue.Empty:
+            except queue.Empty:
                 empty = True
         return elem_list
 

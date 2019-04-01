@@ -107,7 +107,7 @@ class ZomcatWrapper(object):
         request_count = 0
         request_time = 0
         http_errors = 0
-        for _type, _port_prefix in THREAD_POOL_PORT_PREFIXES.items():
+        for _type, _port_prefix in list(THREAD_POOL_PORT_PREFIXES.items()):
             try:
                 row = self._jmx().query('Catalina:type=GlobalRequestProcessor,name="{}-apr-{}{}"'.format(_type,
                                         _port_prefix, self.instance), 'requestCount', 'processingTime', 'errorCount'
@@ -194,4 +194,4 @@ if __name__ == '__main__':
     counter = plugin_manager.get_plugin_obj_by_name('counter', 'Function').create(factory_ctx)
 
     zomcat = ZomcatWrapper(host, instance, http=http, jmx=jmx, counter=counter)
-    print json.dumps(zomcat.health(), indent=4, sort_keys=True)
+    print(json.dumps(zomcat.health(), indent=4, sort_keys=True))

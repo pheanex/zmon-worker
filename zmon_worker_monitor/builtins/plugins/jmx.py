@@ -67,7 +67,7 @@ class JmxWrapper(object):
         for result in results:
             attr = result['attributes']
 
-            for key, val in attr.items():
+            for key, val in list(attr.items()):
                 if 'password' in key.lower():
                     attr[key] = ''
                     continue
@@ -79,7 +79,7 @@ class JmxWrapper(object):
             d[result['beanName']] = attr
         if len(d) == 1:
             # strip the top-level "bean name" keys
-            return d.values()[0]
+            return list(d.values())[0]
         else:
             return d
 
@@ -127,4 +127,4 @@ if __name__ == '__main__':
     import sys
 
     jmx = JmxWrapper(*sys.argv[1:4])
-    print jmx.query(*sys.argv[4:]).results()
+    print(jmx.query(*sys.argv[4:]).results())

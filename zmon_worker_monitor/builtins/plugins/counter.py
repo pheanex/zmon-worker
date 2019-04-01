@@ -74,10 +74,10 @@ class CounterWrapper(object):
 
 if __name__ == '__main__':
     counter = CounterWrapper('test', 'localhost', 6379)
-    print counter.per_second(1)
+    print(counter.per_second(1))
     time.sleep(2)
-    print counter.per_second(101)
+    print(counter.per_second(101))
     time.sleep(1)
-    print counter.per_second(111)
+    print(counter.per_second(111))
     time.sleep(1)
-    print counter.per_minute(211)
+    print(counter.per_minute(211))

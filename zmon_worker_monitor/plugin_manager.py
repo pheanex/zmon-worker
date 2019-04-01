@@ -62,7 +62,7 @@ def _builtins_paths(subpackages, raise_errors=True):
             logger.exception('erroneous plugins package: %s. Exception: ', subpkg)
             if raise_errors:
                 _, ev, tb = sys.exc_info()
-                raise PluginFatalError('Builtins plugins error in {}. Reason: {}'.format(subpkg, ev)), None, tb
+                raise PluginFatalError('Builtins plugins error in {}. Reason: {}'.format(subpkg, ev)).with_traceback(tb)
         else:
             folders.append(path)
 
@@ -194,7 +194,7 @@ def collect_plugins(load_builtins=True, load_env=True, additional_dirs=None, glo
         all_plugins = manager.getAllPlugins()
 
         if len(all_plugins) != len(candidates):
-            plugin_paths = map(_path_source_to_plugin, [p.path for p in all_plugins])
+            plugin_paths = list(map(_path_source_to_plugin, [p.path for p in all_plugins]))
 
             dropped = [c for c in candidates if c[0] not in plugin_paths]
             logger.error('These plugin candidates have errors: %s', dropped)
@@ -210,10 +210,10 @@ def collect_plugins(load_builtins=True, load_env=True, additional_dirs=None, glo
             conf_global = {}
             try:
                 conf_global = {
-                    str(c)[len(config_prefix):]: v for c, v in global_config.iteritems()
+                    str(c)[len(config_prefix):]: v for c, v in global_config.items()
                     if str(c).startswith(config_prefix)
                 }
-                logger.debug('Plugin %s received global conf keys: %s', plugin.name, conf_global.keys())
+                logger.debug('Plugin %s received global conf keys: %s', plugin.name, list(conf_global.keys()))
             except Exception:
                 logger.exception('Failed to parse global configuration. Reason: ')
                 if raise_errors:
@@ -224,7 +224,7 @@ def collect_plugins(load_builtins=True, load_env=True, additional_dirs=None, glo
                 if plugin.details.has_section('Configuration'):
                     # plugin.plugin_info.detail has the safeconfig object
                     conf = {c: v for c, v in plugin.details.items('Configuration')}
-                logger.debug('Plugin %s received local conf keys: %s', plugin.name, conf.keys())
+                logger.debug('Plugin %s received local conf keys: %s', plugin.name, list(conf.keys()))
             except Exception:
                 logger.exception('Failed to load local configuration from plugin: %s. Reason: ', plugin.name)
                 if raise_errors:
@@ -253,7 +253,7 @@ def collect_plugins(load_builtins=True, load_env=True, additional_dirs=None, glo
         logger.exception('Unexpected error during plugin collection: ')
         if raise_errors:
             _, ev, tb = sys.exc_info()
-            raise PluginFatalError("Error while loading plugins. Reason: {}".format(ev)), None, tb
+            raise PluginFatalError("Error while loading plugins. Reason: {}".format(ev)).with_traceback(tb)
 
 
 def get_plugins_of_category(category, active=True, raise_errors=True):
