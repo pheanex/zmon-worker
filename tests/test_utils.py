@@ -58,10 +58,10 @@ def test_periodic_buffered_action_retries_exceeded(monkeypatch):
 
 
 def test_periodic_buffered_action_queue_full():
-    queue = MagicMock()
-    queue.put_nowait.side_effect = queue.Full()
+    m_queue = MagicMock()
+    m_queue.put_nowait.side_effect = queue.Full()
     pba = PeriodicBufferedAction(action=None)
-    pba._queue = queue
+    pba._queue = m_queue
     pba.log = MagicMock()
     pba.enqueue('stuff')
     pba.log.exception.assert_called_with('Fatal Error: is worker out of memory? Details: ')

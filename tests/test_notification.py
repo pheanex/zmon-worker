@@ -59,5 +59,5 @@ class TestBaseNotification(unittest.TestCase):
             'entity': entity,
         }
         self.assertEqual(BaseNotification._get_subject(ctx),
-                          "NEW ALERT: <<< Unformattable name '{thing:w} is {status}': "
-                          "Unknown format code 'w' for object of type 'str' >>> on everything")
+                         "NEW ALERT: <<< Unformattable name '{thing:w} is {status}': "
+                         "Unknown format code 'w' for object of type 'str' >>> on everything")

@@ -85,7 +85,7 @@ def test_action_decorator(monkeypatch):
 
     # methods with same name are not equal because they are bounded to different instances
     assert not [_f for _f in [(met1 == met2 or met1() == met2()) for met1 in methods1 for met2 in methods2
-                             if met1.__name__ == met2.__name__] if _f]
+                if met1.__name__ == met2.__name__] if _f]
 
     #
     # check we can collect methods from different regions and they don't mix

@@ -345,8 +345,9 @@ http_request_count{method="post",code="400"}    3 1395066363000
     get.return_value = resp
     monkeypatch.setattr('requests.get', get)
     http = HttpWrapper('http://example.org/prometheus/')
-    expected = {'http_request_count': [({'code': '200', 'method': 'post'}, 1027.0),
-                                        ({'code': '400', 'method': 'post'}, 3.0)]}
+    expected = {'http_request_count': [
+        ({'code': '200', 'method': 'post'}, 1027.0), ({'code': '400', 'method': 'post'}, 3.0)
+    ]}
     assert expected == http.prometheus()
 
 

@@ -46,7 +46,7 @@ class MsSqlFactory(IFunctionFactoryPlugin):
 def _import_db_driver():
     try:
         _cx_MsSql = __import__('pymssql', globals(), locals(), [], -1)
-    except Exception as e:
+    except Exception:
         logger.exception('Import of module pymssql failed')
         raise
     return _cx_MsSql
