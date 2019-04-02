@@ -103,12 +103,12 @@ class Mail(BaseNotification):
                                         include_entity=include_entity,
                                         alert_url=alert_url,
                                         **alert)
-                part1 = MIMEText(body_plain.encode('utf-8'), 'plain', 'utf-8')
-                part2 = MIMEText(body_html.encode('utf-8'), 'html', 'utf-8')
+                part1 = MIMEText(body_plain, 'plain', 'utf-8')
+                part2 = MIMEText(body_html, 'html', 'utf-8')
                 msg.attach(part1)
                 msg.attach(part2)
             else:
-                msg = MIMEText(body_plain.encode('utf-8'), 'plain', 'utf-8')
+                msg = MIMEText(body_plain, 'plain', 'utf-8')
 
             msg['Subject'] = subject
             msg['From'] = 'ZMON 2 <{}>'.format(sender)

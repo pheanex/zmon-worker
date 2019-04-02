@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import pythonwhois
+import whois
 
 from zmon_worker_monitor.zmon_worker.errors import ConfigurationError
 from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactoryPlugin, propartial
@@ -33,15 +33,6 @@ class WhoisWrapper(object):
             raise ConfigurationError('Whois wrapper improperly configured. Valid host is required!')
 
         self.host = host
-        self.timeout = timeout
 
     def check(self):
-        parsed = {}
-        data, server_list = pythonwhois.net.get_whois_raw(self.host, with_server_list=True)
-        if len(server_list) > 0:
-            parsed = pythonwhois.parse.parse_raw_whois(data, normalized=True, never_query_handles=False,
-                                                       handle_server=server_list[-1])
-        else:
-            parsed = pythonwhois.parse.parse_raw_whois(data, normalized=True)
-
-        return parsed
+        return whois.whois(self.host)
