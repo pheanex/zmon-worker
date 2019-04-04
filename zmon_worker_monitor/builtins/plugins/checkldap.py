@@ -260,7 +260,7 @@ class LdapWrapper(object):
 
         try:
             rid2url, url2rid = self._get_rid_to_url(self.host)
-            ldapservers = [url[7:] for url in list(url2rid.keys())]
+            ldapservers = [url[7:] for url in url2rid.keys()]
             return self._sync(ldapservers)
         except CheckError:
             raise

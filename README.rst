@@ -42,7 +42,7 @@ Ubuntu/Debian:
 .. code-block:: bash
 
     $ sudo apt-get install build-essential python2.7-dev libpq-dev libldap2-dev libsasl2-dev libsnappy-dev libev4 libev-dev freetds-dev
-    $ sudo pip2 install -r requirements.txt
+    $ sudo pip3 install -r requirements.txt
 
 macOS:
 
@@ -55,7 +55,7 @@ Start the ZMON worker process:
 
 .. code-block:: bash
 
-    $ python2 -m zmon_worker_monitor
+    $ python3 -m zmon_worker_monitor
 
 You can query the worker monitor via the REST API:
 
@@ -67,7 +67,7 @@ You can also query the worker monitor via RPC:
 
 .. code-block:: bash
 
-    $ python2 -m zmon_worker_monitor.rpc_client http://localhost:23500/zmon_rpc list_stats
+    $ python3 -m zmon_worker_monitor.rpc_client http://localhost:23500/zmon_rpc list_stats
 
 Running Unit Tests
 ==================

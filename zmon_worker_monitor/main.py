@@ -73,7 +73,7 @@ def main(args=None):
     process_config(config)
 
     # allow overwritting any configuration setting via env vars
-    for k, v in list(os.environ.items()):
+    for k, v in os.environ.items():
         if k.startswith('WORKER_'):
             config[k.replace("WORKER_", "").replace("_", ".").lower()] = v
 

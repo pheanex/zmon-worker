@@ -1,10 +1,10 @@
-
-
 import json
 import time
 import traceback
-from zmon_worker_monitor.main import main
+
 from mock import MagicMock
+
+from zmon_worker_monitor.main import main
 
 
 def build_redis_queue_item(check_command):
@@ -75,6 +75,7 @@ def execute_check(tmpdir, monkeypatch, check_command, expected_strings):
     proc.proc_control.terminate_all_processes()
 
     assert data is not None
+
     for string in expected_strings:
         assert string in data['zmon:checks:123:77']
 

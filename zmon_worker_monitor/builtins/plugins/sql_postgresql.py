@@ -174,7 +174,7 @@ class SqlWrapper(object):
                     cur.execute(self._stmt)
                     row = cur.fetchone()
                     if row:
-                        for k, v in list(row._asdict().items()):
+                        for k, v in row._asdict().items():
                             result[k] = result.get(k, [])
                             result[k].append(v)
                 finally:
@@ -182,7 +182,7 @@ class SqlWrapper(object):
         except Exception as e:
             raise DbError(str(e), operation=self._stmt).with_traceback(sys.exc_info()[2])
 
-        for k, v in list(result.items()):
+        for k, v in result.items():
             try:
                 result[k] = agg(v)
             except Exception:

@@ -111,14 +111,14 @@ def test_action_decorator(monkeypatch):
     r1 = fib1.state_str_with_side_effect1(1, 2, c={3})  # First time call for this method on fib1
     r2 = fib1.state_str_with_side_effect1(1, 2, c={3})  # 2nd time should be cached
     state += 1
-    assert r1 == r2 == 'State1: 1. Args: 1, 2. Kwargs: c=set([3]), d=None'
+    assert r1 == r2 == 'State1: 1. Args: 1, 2. Kwargs: c={3}, d=None'
 
     for arg1 in [1, 2]:
         for d in [None, 'd', [11, 22, 33], {'a': 1, 'b': 2}, lambda x: x]:
             # even d=None will refresh cache, as decorator does not check method's default kwargs
             state += 1
             r3 = fib1.state_str_with_side_effect1(arg1, 2, c={3}, d=d)  # but no cache hit if we change the arguments
-            assert r1 != r3 and r3 == 'State1: %s. Args: %s, 2. Kwargs: c=set([3]), d=%s' % (state, arg1, d)
+            assert r1 != r3 and r3 == 'State1: {}. Args: {}, 2. Kwargs: c={{3}}, d={}'.format(state, arg1, d)
 
     #
     # Check that we can invalidate cached regions, all methods from objects, and single methods
@@ -128,34 +128,34 @@ def test_action_decorator(monkeypatch):
     r1 = fib2.state_str_with_side_effect1(1, 2, c={69})  # First time call for this method on fib2
     r2 = fib2.state_str_with_side_effect1(1, 2, c={69})  # 2nd time should be cached
     state += 1
-    assert r1 == r2 == 'State1: %s. Args: 1, 2. Kwargs: c=set([69]), d=None' % state
+    assert r1 == r2 == 'State1: {}. Args: 1, 2. Kwargs: c={{69}}, d=None'.format(state)
 
     # wait enough so cache must be refreshed
     time.sleep(t_wait_method_2)
     state += 1
     r3 = fib2.state_str_with_side_effect1(1, 2, c={69})  # this time cache should be refreshed
-    assert r2 != r3 == 'State1: %s. Args: 1, 2. Kwargs: c=set([69]), d=None' % state
+    assert r2 != r3 == 'State1: {}. Args: 1, 2. Kwargs: c={{69}}, d=None'.format(state)
 
     # now lets invalidate the whole cache region and see that it is refreshed
     process_controller.register.invalidate(region='region1')
     r4 = fib2.state_str_with_side_effect1(1, 2, c={69})  # this time cache should be refreshed
     r44 = fib2.state_str_with_side_effect1(1, 2, c={69})  # and here comes from cache again
     state += 1
-    assert r3 != r4 == r44 == 'State1: %s. Args: 1, 2. Kwargs: c=set([69]), d=None' % state
+    assert r3 != r4 == r44 == 'State1: {}. Args: 1, 2. Kwargs: c={{69}}, d=None'.format(state)
 
     # now lets invalidate all methods from that object and see that it is refreshed
     process_controller.register.invalidate(region='region1', obj=fib2)
     r5 = fib2.state_str_with_side_effect1(1, 2, c={69})  # this time cache should be refreshed
     r55 = fib2.state_str_with_side_effect1(1, 2, c={69})  # and here comes from cache again
     state += 1
-    assert r4 != r5 == r55 == 'State1: %s. Args: 1, 2. Kwargs: c=set([69]), d=None' % state
+    assert r4 != r5 == r55 == 'State1: {}. Args: 1, 2. Kwargs: c={{69}}, d=None'.format(state)
 
     # now lets invalidate only this single method and see that it is refreshed
     process_controller.register.invalidate(region='region1', obj=fib2, method=fib2.state_str_with_side_effect1)
     r6 = fib2.state_str_with_side_effect1(1, 2, c={69})  # this time cache should be refreshed
     r66 = fib2.state_str_with_side_effect1(1, 2, c={69})  # and here comes from cache again
     state += 1
-    assert r5 != r6 == r66 == 'State1: %s. Args: 1, 2. Kwargs: c=set([69]), d=None' % state
+    assert r5 != r6 == r66 == 'State1: {}. Args: 1, 2. Kwargs: c={{69}}, d=None'.format(state)
 
 
 class NonSpawningProcessPlus(process_controller.ProcessPlus):
@@ -540,8 +540,6 @@ def test_process_plus_pings(monkeypatch):
 
     monkeypatch.undo()  # undo patching
 
-    # assert 0
-
 
 def test_process_plus_ping_aggregations(monkeypatch):
 
@@ -772,7 +770,7 @@ def test_process_group(monkeypatch):
     # Reset the Mock counter, this test rely on mock generation counter starting from 1
     NonSpawningProcessPlus.reset_mock_counter()
 
-    action_interval = 0.2
+    action_interval = 0.5
     num_procs = 3
 
     # create our process_group, a dict like object mapping proc_name -> objProcessPlus

@@ -410,7 +410,7 @@ class FlowControlReactor(object):
 
     def action_hard_kill(self):
         """ hard kill logic """
-        for th_name, (taskname, t_hard, t_soft, ts) in list(self._current_task_by_thread.copy().items()):
+        for th_name, (taskname, t_hard, t_soft, ts) in self._current_task_by_thread.copy().items():
             if time.time() > ts + t_hard:
                 msg = 'Hard Kill request started for worker pid=%s, task: %s, t_hard=%d' % (self._pid, taskname, t_hard)
                 logger.warn(msg)
@@ -463,7 +463,7 @@ class FlowControlReactor(object):
                 else:
                     event_dict[key] = e
 
-            events = sorted(list(event_dict.values()), key=itemgetter('timestamp'))
+            events = sorted(event_dict.values(), key=itemgetter('timestamp'))
             if events:
                 self._rpc_client.add_events(self._pid, events)  # rpc call to send events to parent
             self._t_last_events = t_now

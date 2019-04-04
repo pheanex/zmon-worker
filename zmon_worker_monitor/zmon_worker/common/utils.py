@@ -22,7 +22,7 @@ def flatten(structure, key='', path='', flattened=None):
     if not isinstance(structure, dict):
         flattened[((path + '.' if path else '')) + key] = structure
     else:
-        for new_key, value in list(structure.items()):
+        for new_key, value in structure.items():
             flatten(value, new_key, '.'.join([_f for _f in [path, key] if _f]), flattened)
     return flattened
 

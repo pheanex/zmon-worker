@@ -24,7 +24,7 @@ def flatten(structure, key='', path='', flattened=None):
     else:
         #        for i, item in enumerate(structure):
         #            flatten(item, '%d' % i, '.'.join(filter(None, [path, key])), flattened)
-        for new_key, value in list(structure.items()):
+        for new_key, value in structure.items():
             flatten(value, new_key, '.'.join([_f for _f in [path, key] if _f]), flattened)
     return flattened
 

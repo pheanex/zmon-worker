@@ -67,7 +67,7 @@ class JmxWrapper(object):
         for result in results:
             attr = result['attributes']
 
-            for key, val in list(attr.items()):
+            for key, val in attr.items():
                 if 'password' in key.lower():
                     attr[key] = ''
                     continue

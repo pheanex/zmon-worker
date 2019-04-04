@@ -1,5 +1,5 @@
-import __future__
 import ast
+
 from inspect import isclass
 
 
@@ -41,30 +41,30 @@ def check_ast_node_is_safe(node, source):
     True
 
     >>> node = ast.parse('instance._Instance__request')
-    >>> check_ast_node_is_safe(node, '<source>')
+    >>> check_ast_node_is_safe(node, '<source>')  # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    InvalidEvalExpression: <source> should not try to access hidden attributes (for example '__class__')
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <source> should not try to access hidden attributes (for example '__class__')
 
     >>> check_ast_node_is_safe(ast.parse('def m(): return ().__class__'), '<hidden>')
     Traceback (most recent call last):
         ...
-    InvalidEvalExpression: <hidden> should not try to access hidden attributes (for example '__class__')
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <hidden> should not try to access hidden attributes (for example '__class__')
 
 
-    >>> check_ast_node_is_safe(ast.parse('def horror(g): exec "exploit = ().__" + "class" + "__" in g'), '<horror>')
+    >>> check_ast_node_is_safe(ast.parse('def horror(g): exec("exploit = ().__" + "class" + "__" in g)'), '<horror>')
     Traceback (most recent call last):
         ...
-    InvalidEvalExpression: <horror> should not try to execute arbitrary code
-    '''
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <horror> should not try to execute arbitrary code
+    '''  # noqa
 
     for n in ast.walk(node):
-        if isinstance(n, ast.Attribute):
-            if '__' in n.attr:
-                raise InvalidEvalExpression(
-                    "{} should not try to access hidden attributes (for example '__class__')".format(source))
-        elif isinstance(n, ast.Exec):
+        if isinstance(n, ast.Attribute) and '__' in n.attr:
+            raise InvalidEvalExpression(
+                "{} should not try to access hidden attributes (for example '__class__')".format(source))
+        elif hasattr(n, 'id') and n.id in ('exec', 'eval'):
             raise InvalidEvalExpression('{} should not try to execute arbitrary code'.format(source))
+
     return node
 
 
@@ -93,39 +93,54 @@ def safe_eval(expr, eval_source='<string>', **kwargs):
     >>> safe_eval('def m(): return value', value=10)
     10
 
-    >>> safe_eval('def m(param): return value', value=10)
+    >>> safe_eval('def m(param): return value', value=10)  # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    TypeError: m() takes exactly 1 argument (0 given)
+    TypeError: m() missing 1 required positional argument: 'param'
 
     >>> safe_eval('lambda: value', value=10)
     10
 
-    >>> result = safe_eval('def m(): print value', value=10)
+    >>> result = safe_eval('def m(): print(value)', value=10)
     Traceback (most recent call last):
         ...
-    SyntaxError: invalid syntax
+    NameError: name 'print' is not defined
 
-    >>> result = safe_eval('print value', value=10)
+    >>> result = safe_eval('print(value)', value=10)
     Traceback (most recent call last):
         ...
-    SyntaxError: invalid syntax
+    NameError: name 'print' is not defined
 
-    >>> safe_eval('def m(): return lambda: value', value=10) #doctest: +ELLIPSIS
-    <function <lambda> at ...>
+    >>> safe_eval('def m(): return lambda: value', value=10) # doctest: +ELLIPSIS
+    <function m.<locals>.<lambda> at ...>
 
-    >>> safe_eval('error = value', value=10, eval_source='<alert-condition>')
+    >>> safe_eval('error = value', value=10, eval_source='<alert-condition>')  # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    InvalidEvalExpression: <alert-condition> can contain a python expression, a function call or a callable class definition
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <alert-condition> can contain a python expression, a function call or a callable class definition
 
     >>> safe_eval('def m(): return value.__class__', value=10)
     Traceback (most recent call last):
         ...
-    InvalidEvalExpression: <string> should not try to access hidden attributes (for example '__class__')
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <string> should not try to access hidden attributes (for example '__class__')
+
+    >>> safe_eval('e=exec;e("print(True)")', value=10)
+    Traceback (most recent call last):
+        ...
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <string> should not try to execute arbitrary code
+
+    >>> safe_eval('e=eval;e("print(True)")', value=10)
+    Traceback (most recent call last):
+        ...
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <string> should not try to execute arbitrary code
+
+    >>> safe_eval('l=lambda:exec;l()("print(True)")', value=10)
+    Traceback (most recent call last):
+        ...
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <string> should not try to execute arbitrary code
 
     >>> safe_eval("""
-    ... class CallableClass(object):
+    ... class CallableClass:
     ...
     ...     def get_value(self):
     ...         return value
@@ -136,7 +151,7 @@ def safe_eval(expr, eval_source='<string>', **kwargs):
     10
 
     >>> safe_eval("""
-    ... class NotCallableClass(object):
+    ... class NotCallableClass:
     ...
     ...     def get_value(self):
     ...         return value
@@ -146,7 +161,7 @@ def safe_eval(expr, eval_source='<string>', **kwargs):
     ... """, value=10)
     Traceback (most recent call last):
         ...
-    InvalidEvalExpression: <string> should contain a callable class definition (missing __call__ method?)
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <string> should contain a callable class definition (missing __call__ method?)
 
 
     >>> safe_eval("""
@@ -158,17 +173,20 @@ def safe_eval(expr, eval_source='<string>', **kwargs):
     ... """, value=10)
     Traceback (most recent call last):
         ...
-    InvalidEvalExpression: <string> should contain only one python expression, a function call or a callable class definition
+    zmon_worker_monitor.zmon_worker.common.eval.InvalidEvalExpression: <string> should contain only one python expression, a function call or a callable class definition
 
     '''  # noqa
-
-    g = {'__builtins__': {}, 'object': object, '__name__': __name__}
+    g = {
+        '__builtins__': {'__build_class__': __builtins__['__build_class__']},
+        'object': object,
+        '__name__': __name__,
+    }
     # __builtins__ should be masked away to disable builtin functions
     # object is needed if the NewStyle class is being created
     # __name__ is needed to be able to compile a class
     g.update(kwargs)
 
-    node = compile(expr, eval_source, 'exec', ast.PyCF_ONLY_AST | __future__.CO_FUTURE_PRINT_FUNCTION)
+    node = compile(expr, eval_source, 'exec', ast.PyCF_ONLY_AST)
     node = check_ast_node_is_safe(node, eval_source)
     body = node.body
     if body and len(body) == 1:
@@ -192,7 +210,7 @@ def safe_eval(expr, eval_source='<string>', **kwargs):
                 raise InvalidEvalExpression(
                     '{} should contain only one function or one callable class definition'.format(eval_source))
         elif isinstance(x, ast.Expr):
-            cc = compile(expr, eval_source, 'eval', __future__.CO_FUTURE_PRINT_FUNCTION)  # can be nicely cached
+            cc = compile(expr, eval_source, 'eval')  # can be nicely cached
             r = eval(cc, g)
             if callable(r):
                 # Try() returns callable that should be executed

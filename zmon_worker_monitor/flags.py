@@ -40,14 +40,14 @@ def flag_dict():
     global __flag_dict
     if __flag_dict is None:
         __flag_dict = {
-            f: v for f, v in list(vars().items())
+            f: v for f, v in vars().items()
             if f.isupper() and not (f.startswith('__') or callable(v)) and is_pow2(v)
         }
     return __flag_dict
 
 
 def num2flags(number):
-    return [v for v in list(flag_dict().values()) if has_flag(number, v)]
+    return [v for v in flag_dict().values() if has_flag(number, v)]
 
 
 def flags2num(flag_list):

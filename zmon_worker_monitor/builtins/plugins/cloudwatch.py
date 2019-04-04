@@ -39,7 +39,7 @@ class CloudwatchWrapperFactory(IFunctionFactoryPlugin):
 
 
 def matches(dimensions, filters):
-    for key, pattern in list(filters.items()):
+    for key, pattern in filters.items():
         if not fnmatch.fnmatch(''.join(dimensions.get(key, '')), pattern):
             return False
     return True
@@ -90,7 +90,7 @@ class CloudwatchWrapper(object):
         if isinstance(dimensions, dict):
             # transform Python dict to stupid AWS list structure
             # see http://boto3.readthedocs.org/en/latest/reference/services/cloudwatch.html#CloudWatch.Client.get_metric_statistics  # noqa
-            dimensions = list({'Name': k, 'Value': v} for k, v in list(dimensions.items()))
+            dimensions = list({'Name': k, 'Value': v} for k, v in dimensions.items())
 
         end = end or datetime.datetime.utcnow()
         start = start or (end - datetime.timedelta(minutes=minutes))
@@ -112,13 +112,13 @@ class CloudwatchWrapper(object):
         if extended_statistics is None and len(statistics) == 1:
             result = data_points[-1][statistics[0]]
         elif statistics is not None:
-            result.update({s: v for s, v in list(data_points[-1].items()) if s in statistics})
+            result.update({s: v for s, v in data_points[-1].items() if s in statistics})
 
         if statistics is None and len(extended_statistics) == 1:
             result = data_points[-1].get('ExtendedStatistics', {}).get(extended_statistics[0])
         elif extended_statistics is not None:
             result.update({
-                s: v for s, v in list(data_points[-1].get('ExtendedStatistics', {}).items()) if s in extended_statistics
+                s: v for s, v in data_points[-1].get('ExtendedStatistics', {}).items() if s in extended_statistics
             })
 
         return result
@@ -134,7 +134,7 @@ class CloudwatchWrapper(object):
             if val and '*' in val:
                 filter_dimension_pattern[key] = val
                 del dimensions[key]
-        dimension_kvpairs = [{'Name': k, 'Value': v} for k, v in list(dimensions.items())]
+        dimension_kvpairs = [{'Name': k, 'Value': v} for k, v in dimensions.items()]
         args = {'Dimensions': dimension_kvpairs, 'MetricName': metric_name}
         if namespace:
             args['Namespace'] = namespace
@@ -162,7 +162,7 @@ class CloudwatchWrapper(object):
                 metric['Dimensions'], metric['MetricName'], statistics, metric['Namespace'], period,
                 start=start, end=end)
             if val is not None:
-                for [dim_name, dim_val] in list(metric_dimensions.items()):
+                for [dim_name, dim_val] in metric_dimensions.items():
                     if dim_name not in data['dimensions']:
                         data['dimensions'][dim_name] = collections.defaultdict(int)
                     data['dimensions'][dim_name][dim_val] += val

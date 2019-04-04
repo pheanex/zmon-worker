@@ -342,7 +342,7 @@ def _inject_alert_parameters(alert_parameters, ctx):
     params = {}
 
     if alert_parameters:
-        for apname, apdata in list(alert_parameters.items()):
+        for apname, apdata in alert_parameters.items():
             if apname in ctx:
                 raise Exception('Parameter name: %s clashes in context', apname)
             value = _parse_alert_parameter_value(apdata)
@@ -429,6 +429,7 @@ def _less(c, d):
 
 def build_condition_context(con, check_id, alert_id, entity, captures, alert_parameters):
     '''
+    >>> plugin_manager.init_plugin_manager()
     >>> plugin_manager.collect_plugins(); 'timeseries_median' in build_condition_context(None, 1, 1, {'id': '1'}, {}, {})
     True
     >>> set(('history', 'kairosdb', 'time', 'timeseries_percentile')) - set(build_condition_context(None, 1, 1, {'id': '1'}, {}, {})) == set()
@@ -670,11 +671,11 @@ def urlparse(url):
 
 
 def check_filter_metric(metric, keep):
-    return dict((k, v) for k, v in list(metric.items()) if k in keep)
+    return dict((k, v) for k, v in metric.items() if k in keep)
 
 
 def check_filter_metrics(metrics, keep):
-    return dict((k, check_filter_metric(t, keep)) for k, t in list(metrics.items()))
+    return dict((k, check_filter_metric(t, keep)) for k, t in metrics.items())
 
 
 def jsonpath_flat_filter(obj, path):
@@ -899,7 +900,7 @@ class MainTask(object):
         if now > self._last_metrics_sent + METRICS_INTERVAL:
             p = self.con.pipeline()
             p.sadd('zmon:metrics', self.worker_name)
-            for key, val in list(self._counter.items()):
+            for key, val in self._counter.items():
                 p.incrby('zmon:metrics:{}:{}'.format(self.worker_name, key), val)
             p.set('zmon:metrics:{}:ts'.format(self.worker_name), now)
             p.execute()
@@ -934,7 +935,7 @@ class MainTask(object):
                 results_by_id[cr['check_id']].append(cr)
 
             # make separate posts per check_id
-            for check_id, results in list(results_by_id.items()):
+            for check_id, results in results_by_id.items():
 
                 # Which span to pickup from all the results?! - we start a fresh span for this check results list!
                 current_span = opentracing.tracer.start_span(operation_name='send_to_dataservice')
@@ -1215,7 +1216,7 @@ class MainTask(object):
 
     def _check_result_limit(self, result):
         if isinstance(result, dict):
-            key_count = len(list(flatten(result).keys()))
+            key_count = len(flatten(result).keys())
             if key_count > self.max_result_keys:
                 raise ResultSizeError(
                     'Result keys count ({}) exceeded the maximum value: {}'.format(key_count, self.max_result_keys))
@@ -1356,7 +1357,7 @@ class MainTask(object):
                 # secure_host = '{}.pp'.format(req['entity']['host'][3:])
                 secure_host = '{}.{}'.format(req['entity']['host'][len(prefix):], prefix[:-1])
                 # relplace all real host values occurrences with secure_host
-                req['entity'].update({k: v.replace(real_host, secure_host) for k, v in list(req['entity'].items()) if
+                req['entity'].update({k: v.replace(real_host, secure_host) for k, v in req['entity'].items() if
                                       isinstance(v, str) and real_host in v and k != 'id'})
 
                 self.logger.warn('secure req[entity] after pp- transformations: %s', req['entity'])
@@ -1394,7 +1395,7 @@ class MainTask(object):
         ctx['entity'] = entity
 
         # populate check context with functions from plugins' function factories
-        for func_name, func_factory in list(self._function_factories.items()):
+        for func_name, func_factory in self._function_factories.items():
             if func_name not in ctx:
                 ctx[func_name] = func_factory.create(factory_ctx)
         return ctx
@@ -1513,7 +1514,7 @@ class MainTask(object):
         if alert_parameters:
             pure_captures = captures.copy()
             try:
-                captures = {k: p['value'] for k, p in list(alert_parameters.items())}
+                captures = {k: p['value'] for k, p in alert_parameters.items()}
             except Exception:
                 self.logger.exception('Error when capturing parameters: ')
             captures.update(pure_captures)
