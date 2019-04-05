@@ -61,7 +61,7 @@ class EventLogWrapper(object):
         returns a dict (typeId as hex=>count) if more than one type ID is given
         returns a dict (fieldValue => count) if one type ID is given and a field name with "group_by"
 
-        >>> EventLogWrapper(object, 'https://eventlog.example.com/').count('a', time_from='-1h')
+        >>> EventLogWrapper(object, 'https://eventlog.example.com/').count('a', time_from='-1h')  # doctest: +ELLIPSIS
         Traceback (most recent call last):
             ...
         CheckError: EventLog type ID must be a integer
