@@ -36,9 +36,9 @@ if __name__ == '__main__':
             include_package_data=True,  # needed to include templates (see MANIFEST.in)
 
             # more metadata for upload to PyPI
-            author='Henning Jacobs',
-            author_email='henning.jacobs@zalando.de',
-            keywords='zalando zmon zmon2 worker component monitoring infrastructure',
+            author='Zalando SE',
+            author_email='team-eagleeye@zalando.de',
+            keywords='zalando zmon worker component monitoring infrastructure',
             long_description=open('README.rst').read(),
             classifiers=[
                 'Development Status :: 5 - Production/Stable',
@@ -46,7 +46,7 @@ if __name__ == '__main__':
                 'License :: OSI Approved :: Apache Software License',
                 'Operating System :: OS Independent',
                 'Programming Language :: Python',
-                'Programming Language :: Python :: 2',
+                'Programming Language :: Python :: 3.6',
                 'Topic :: Software Development :: Libraries :: Python Modules'],
 
             platforms='All',
