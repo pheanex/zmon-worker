@@ -10,9 +10,18 @@ from zmon_worker_monitor.zmon_worker.errors import CheckError
 from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactoryPlugin, propartial
 
 
+class SAMLError(CheckError):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
+
+    def __str__(self):
+        return 'SAML Error. Message: {}'.format(self.message)
+
+
 class SAMLFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(SAMLFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """
@@ -33,25 +42,8 @@ class SAMLFactory(IFunctionFactoryPlugin):
         return propartial(SAMLWrapper, url=self.saml_url, user=self.username, password=self.__password)
 
 
-class SAMLError(CheckError):
-    def __init__(self, message):
-        self.message = message
-        super(SAMLError, self).__init__()
-
-    def __str__(self):
-        return 'SAML Error. Message: {}'.format(self.message)
-
-
 class SAMLWrapper(object):
-    def __init__(
-            self,
-            url,
-            user=None,
-            password=None,
-            timeout=10,
-            verify=True,
-            headers=None,
-            ):
+    def __init__(self, url, user=None, password=None, timeout=10, verify=True, headers=None):
         self.url = url
         self.username = user
         self.__password = password

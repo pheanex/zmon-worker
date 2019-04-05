@@ -11,7 +11,7 @@ from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactor
 
 class SnmpFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(SnmpFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """
@@ -32,7 +32,7 @@ class SnmpFactory(IFunctionFactoryPlugin):
 class SnmpError(CheckError):
     def __init__(self, message):
         self.message = message
-        super(SnmpError, self).__init__()
+        super().__init__(message)
 
     def __str__(self):
         return 'SNMP Error. Message: {}'.format(self.message)

@@ -90,7 +90,7 @@ def test_alert_series():
     con.lrange.return_value = ['{}']
     with pytest.raises(Exception) as ex:
         alert_series(lambda x: x > -1, 1, con, 1, 'ent-1')
-    assert str(ex.value) == "All alert evaluations failed! [KeyError('value',)]"
+        assert str(ex.value) == "All alert evaluations failed! [KeyError('value')]"
 
     # We have less values than *n*
     con.lrange.return_value = ['{"value":0}', '{"value": 1}', '{"value": 2}']
@@ -187,7 +187,7 @@ def test_evaluate_alert(monkeypatch):
     alert_def['condition'] = 'value["missing-key"] > 0'
     is_alert, captures = task.evaluate_alert(alert_def, req, result)
     assert 'p1' in captures and captures.get('p1') == 'x'
-    assert 'exception' in captures and "'int' object has no attribute '__getitem__'" in captures.get('exception')
+    assert 'exception' in captures and "'int' object is not subscriptable" in captures.get('exception')
     assert is_alert
 
 

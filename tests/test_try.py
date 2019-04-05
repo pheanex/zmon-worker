@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from collections import Callable
+from collections.abc import Callable
 from zmon_worker_monitor.zmon_worker.tasks.main import Try
 
 import unittest

@@ -5,7 +5,7 @@ import datetime
 import json
 import numpy
 
-from collections import Set
+from collections.abc import Set
 from decimal import Decimal
 
 

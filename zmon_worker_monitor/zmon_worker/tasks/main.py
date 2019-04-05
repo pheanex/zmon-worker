@@ -22,8 +22,8 @@ from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
 from bisect import bisect_left
-from collections import Callable, Counter
-from collections import defaultdict
+from collections.abc import Callable
+from collections import defaultdict, Counter
 from datetime import timedelta, datetime
 from operator import itemgetter
 
@@ -1663,7 +1663,7 @@ class MainTask(object):
                     stored_raw = self.con.get(alerts_key)
                     alert_stored = json.loads(stored_raw) if stored_raw else None
                 except (ValueError, TypeError):
-                    self.logger.warn('My messy Error parsing JSON alert result for key: %s', alerts_key)
+                    self.logger.warning('My messy Error parsing JSON alert result for key: %s', alerts_key)
 
                 downtimes = None
 

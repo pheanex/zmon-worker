@@ -8,9 +8,18 @@ from zmon_worker_monitor.zmon_worker.errors import CheckError
 from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactoryPlugin, propartial
 
 
+class OpenAMError(CheckError):
+    def __init__(self, message):
+        self.message = message
+        super().__init__()
+
+    def __str__(self):
+        return 'OpenAM Error. Message: {}'.format(self.message)
+
+
 class OpenAMFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(OpenAMFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """
@@ -31,26 +40,8 @@ class OpenAMFactory(IFunctionFactoryPlugin):
         return propartial(OpenAMWrapper, url=self.openam_base_url, user=self.username, password=self.__password)
 
 
-class OpenAMError(CheckError):
-    def __init__(self, message):
-        self.message = message
-        super(OpenAMError, self).__init__()
-
-    def __str__(self):
-        return 'OpenAM Error. Message: {}'.format(self.message)
-
-
 class OpenAMWrapper(object):
-    def __init__(
-            self,
-            url,
-            user=None,
-            password=None,
-            params=None,
-            timeout=5,
-            verify=True,
-            headers=None,
-            ):
+    def __init__(self, url, user=None, password=None, params=None, timeout=5, verify=True, headers=None):
         self.url = url
         self.params = params or {}
         self.headers = headers or {}
@@ -86,12 +77,12 @@ class OpenAMWrapper(object):
                 verify=self.verify,
             )
         except Exception as e:
-            raise OpenAMError("failed to call OpenAM: "+str(e))
+            raise OpenAMError("failed to call OpenAM: {}".format(str(e)))
 
         try:
             data = r.json()
         except Exception as e:
-            raise OpenAMError("failed to parse OpenAM json: "+str(e))
+            raise OpenAMError("failed to parse OpenAM json: {}".format(str(e)))
 
         result = {}
         result["success"] = 'tokenId' in data

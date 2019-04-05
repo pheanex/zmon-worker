@@ -13,8 +13,8 @@ import logging
 
 from multiprocessing import Process
 from threading import Thread
-from collections import UserDict
-from collections import defaultdict, Iterable
+from collections import UserDict, defaultdict
+from collections.abc import Iterable
 from functools import wraps
 from datetime import timedelta
 
@@ -515,12 +515,12 @@ class ProcessPlus(Process):
                 self.terminate()
                 time.sleep(kill_wait)
                 if self.is_alive():
-                    self.logger.warn('Sending SIGKILL to process with pid=%s', self.pid)
+                    self.logger.warning('Sending SIGKILL to process with pid=%s', self.pid)
                     os.kill(int(self.pid), signal.SIGKILL)
                     time.sleep(0.1)
                 assert not self.is_alive(), 'Fatal: Process {} alive after SIGKILL'.format(self.name)
             else:
-                self.logger.warn('Non termination: Process: %s is not alive!', self.name)
+                self.logger.warning('Non termination: Process: %s is not alive!', self.name)
                 self.abnormal_termination = True
             self.stats = self._closed_stats()
             success = True
@@ -685,13 +685,13 @@ class ProcessGroup(UserDict):
         for name, proc in self.items():
             if proc.pid == pid:
                 return proc
-        self.logger.warn('pid=%s not found in group %s', pid, self.group_name)
+        self.logger.warning('pid=%s not found in group %s', pid, self.group_name)
         return None
 
     def get_by_name(self, proc_name):
         proc = self.get(proc_name)
         if not proc:
-            self.logger.warn('proc_name=%s not found in group %s', proc_name, self.group_name)
+            self.logger.warning('proc_name=%s not found in group %s', proc_name, self.group_name)
         return proc
 
     def filtered(self, proc_names=(), pids=(), lambda_proc=None):
@@ -860,8 +860,8 @@ class ProcessGroup(UserDict):
             proc2.start()
             self.add(proc2)
             self.logger.debug('Respawned process full details: %s --> New process: %s', proc1, proc2)
-            self.logger.warn('Respawned process: proc_name=%s, pid=%s, was_alive=%s --> proc_name=%s, pid=%s',
-                             proc1.name, proc1.pid, was_alive, proc2.name, proc2.pid)
+            self.logger.warning('Respawned process: proc_name=%s, pid=%s, was_alive=%s --> proc_name=%s, pid=%s',
+                                proc1.name, proc1.pid, was_alive, proc2.name, proc2.pid)
             return proc2.name
         except Exception:
             self.logger.exception("Respawn failed. Caught exception with details: ")
@@ -889,7 +889,7 @@ class ProcessGroup(UserDict):
         for name, proc in self.items():
             if not self.stop_action and not proc.is_alive() and proc.has_flag(MONITOR_RESTART):
                 msg = 'Detected abnormal termination of pid: {} ... Restarting'.format(proc.pid)
-                self.logger.warn(msg)
+                self.logger.warning(msg)
                 proc.add_event_explicit('ProcessGroup({})._action_restart_dead'.format(self.group_name), 'ACTION', msg)
                 self.respawn_process(name)
 
