@@ -64,7 +64,7 @@ class EventLogWrapper(object):
         >>> EventLogWrapper(object, 'https://eventlog.example.com/').count('a', time_from='-1h')  # doctest: +ELLIPSIS
         Traceback (most recent call last):
             ...
-        CheckError: EventLog type ID must be a integer
+        zmon_worker_monitor.zmon_worker.errors.CheckError: EventLog type ID must be a integer
 
         >>> EventLogWrapper(object, 'https://eventlog.example.com/').count(123, time_from='-1h')
         Traceback (most recent call last):

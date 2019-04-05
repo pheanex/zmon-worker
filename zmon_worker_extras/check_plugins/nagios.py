@@ -433,10 +433,6 @@ class NagiosWrapper(object):
     @staticmethod
     @error_wrapped
     def _to_dict_win_log(output):
-        '''try to parse this output:
-        c:\Temp\log\maxflow_portal.log2014.04.29: 1 (2014-04-29 15:44:00,741 [5] WARN  BeckIT.MPO.... )
-        '''  # noqa
-
         if 'Nothing matched' in output:
             return {'count': 0}
         else:
