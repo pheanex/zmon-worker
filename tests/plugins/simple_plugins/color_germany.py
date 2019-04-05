@@ -17,7 +17,7 @@ class ColorGermanyPlugin(IColorPlugin):
     """
 
     def __init__(self):
-        super(ColorGermanyPlugin, self).__init__()
+        super().__init__()
         self.country = 'germany'
         self.main_fashion_sites = None
 

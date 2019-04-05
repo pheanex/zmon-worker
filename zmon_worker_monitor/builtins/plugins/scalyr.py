@@ -17,7 +17,7 @@ SCALYR_URL_PREFIX_EU = 'https://eu.scalyr.com/api'
 
 class ScalyrWrapperFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(ScalyrWrapperFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         self.read_key = conf.get('read.key', '')

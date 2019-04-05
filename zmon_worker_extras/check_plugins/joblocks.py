@@ -5,7 +5,7 @@ Zalando-specific function to monitor job locking (Job Framework uses Redis to lo
 """
 
 try:
-    from cmdb.client import Client as cmdb_client
+    from cmdb.client import Client as cmdb_client  # noqa
 except Exception:
     cmdb_client = None
 from dogpile.cache import make_region
@@ -22,7 +22,7 @@ memory_cache = make_region().configure('dogpile.cache.memory', expiration_time=H
 
 class JoblocksFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(JoblocksFactory, self).__init__()
+        super().__init__()
         # fields from configuration
         self.cmdb_url = None
 

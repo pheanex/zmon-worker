@@ -10,7 +10,7 @@ from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactor
 class TcpFactory(IFunctionFactoryPlugin):
 
     def __init__(self):
-        super(TcpFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

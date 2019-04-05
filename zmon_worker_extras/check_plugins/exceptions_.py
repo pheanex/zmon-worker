@@ -12,7 +12,7 @@ from zmon_worker_monitor import plugin_manager
 
 class ExceptionsFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(ExceptionsFactory, self).__init__()
+        super().__init__()
         # fields from dependencies: plugin depends 1 other plugin
         self.http_factory = None
 

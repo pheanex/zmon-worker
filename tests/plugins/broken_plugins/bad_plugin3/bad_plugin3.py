@@ -12,7 +12,7 @@ class BadColorPlugin3(IColorPlugin):
     """
 
     def __init__(self):
-        super(BadColorPlugin3, self).__init__()
+        super().__init__()
         self.country = 'germany'
         self.main_fashion_sites = None
         # artificially produce a ZeroDivisionError on initialization

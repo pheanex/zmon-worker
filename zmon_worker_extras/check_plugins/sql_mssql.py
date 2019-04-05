@@ -20,7 +20,7 @@ MAX_RESULTS = 100
 
 class MsSqlFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(MsSqlFactory, self).__init__()
+        super().__init__()
         # fields from config
         self._user = None
         self._pass = None

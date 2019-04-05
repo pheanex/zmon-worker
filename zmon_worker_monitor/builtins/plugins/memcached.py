@@ -11,11 +11,11 @@ from zmon_worker_monitor import plugin_manager
 import json as pyjson
 
 VALUE_KEYS = frozenset([
-        'curr_items',
-        'bytes',
-        # 'rusage_user',
-        # 'rusage_system',
-    ])
+    'curr_items',
+    'bytes',
+    # 'rusage_user',
+    # 'rusage_system',
+])
 
 COUNTER_KEYS = frozenset([
     'total_connections',
@@ -48,7 +48,7 @@ COUNTER_KEYS = frozenset([
 
 class MemcachedFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(MemcachedFactory, self).__init__()
+        super().__init__()
         # fields to store dependencies: plugin depends on 1 other plugin
         self.counter_factory = None
 
@@ -113,7 +113,7 @@ if __name__ == '__main__':
     plugin_manager.collect_plugins(load_builtins=True, load_env=True)
 
     factory_ctx = {
-            'host': 'localhost',
+        'host': 'localhost',
     }
     counter = plugin_manager.get_plugin_obj_by_name('counter', 'Function').create(factory_ctx)
     wrapper = MemcachedWrapper(counter, sys.argv[1])

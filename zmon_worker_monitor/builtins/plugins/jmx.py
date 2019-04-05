@@ -11,7 +11,7 @@ from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactor
 
 class JmxFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(JmxFactory, self).__init__()
+        super().__init__()
         self._jmxquery_host = None
         self._jmxquery_port = None
 

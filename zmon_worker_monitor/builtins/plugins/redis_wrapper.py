@@ -33,7 +33,7 @@ STATISTIC_COUNTER_KEYS = frozenset([
 
 class RedisFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(RedisFactory, self).__init__()
+        super().__init__()
         # fields to store dependencies: plugin depends on 1 other plugin
         self.counter_factory = None
 

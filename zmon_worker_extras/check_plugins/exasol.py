@@ -13,7 +13,7 @@ from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactor
 
 class ExaplusFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(ExaplusFactory, self).__init__()
+        super().__init__()
         # fields from config
         self._exacrm_cluster = None
         self._exacrm_user = None

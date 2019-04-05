@@ -26,7 +26,7 @@ logger = logging.getLogger('zmon-worker.entities-wrapper')
 
 class EntitiesWrapperFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(EntitiesWrapperFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

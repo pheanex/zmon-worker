@@ -21,7 +21,7 @@ THREAD_POOL_PORT_PREFIXES = {'http': 3, 'ajp': 2}
 class ZomcatFactory(IFunctionFactoryPlugin):
 
     def __init__(self):
-        super(ZomcatFactory, self).__init__()
+        super().__init__()
         # fields to store dependencies: plugin depends on 3 other plugins
         self.http_factory = None
         self.jmx_factory = None

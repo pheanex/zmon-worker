@@ -39,7 +39,7 @@ NON_SAFE_CHARS = re.compile(r'[^a-zA-Z_0-9-]')
 
 class SqlFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(SqlFactory, self).__init__()
+        super().__init__()
         # fields from config
         self._user = None
         self._pass = None

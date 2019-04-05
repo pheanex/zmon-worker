@@ -174,7 +174,9 @@ class NonSpawningProcessPlus(process_controller.ProcessPlus):
         self.id = self.__created_mocks
         self.alive = False
         self.mock_exitcode = None
-        super(NonSpawningProcessPlus, self).__init__(*args, **kwargs)
+
+        super().__init__(*args, **kwargs)
+
         self.name = '{}-{}'.format(self.__class__.__name__, self.id)
         self._testlogger.info('Mock Process %s instantiated with args=%s, kwargs=%s', self.name, args, kwargs)
 

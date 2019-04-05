@@ -34,8 +34,8 @@ class JsonDataEncoder(json.JSONEncoder):
         elif isinstance(o, numpy.bool_):
             return bool(o)
         else:
-            return super(JsonDataEncoder, self).default(o)
+            return super().default(o)
 
     def iterencode(self, o, _one_shot=False):
-        for chunk in super(JsonDataEncoder, self).iterencode(o, _one_shot=_one_shot):
+        for chunk in super().iterencode(o, _one_shot=_one_shot):
             yield {'NaN': 'null', 'Infinity': '"Infinity"', '-Infinity': '"-Infinity"'}.get(chunk, chunk)

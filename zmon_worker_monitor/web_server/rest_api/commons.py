@@ -24,7 +24,7 @@ class ApiExtended(Api):
                 logging.getLogger(__name__).log(e.log_level, 'Error in web_server: {}. {}'.format(e, e.previous_tb))
             return self.make_response({'message': e.message}, e.code or 500)
 
-        return super(ApiExtended, self).handle_error(e)  # fall back to flask-restful's error handling
+        return super().handle_error(e)  # fall back to flask-restful's error handling
 
 
 def get_config():

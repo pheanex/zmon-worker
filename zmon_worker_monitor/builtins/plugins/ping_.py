@@ -9,7 +9,7 @@ from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactor
 class PingFactory(IFunctionFactoryPlugin):
 
     def __init__(self):
-        super(PingFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

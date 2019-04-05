@@ -11,7 +11,7 @@ from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactor
 
 class TimeFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(TimeFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

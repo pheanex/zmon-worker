@@ -52,7 +52,7 @@ tokens.start()
 
 class AppdynamicsFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(AppdynamicsFactory, self).__init__()
+        super().__init__()
         # Fields should be fetched from config
         self._user = None
         self._pass = None

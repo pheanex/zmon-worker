@@ -13,7 +13,7 @@ logging.getLogger('botocore').setLevel(logging.WARN)
 
 class DataPipelineWrapperFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(DataPipelineWrapperFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         return

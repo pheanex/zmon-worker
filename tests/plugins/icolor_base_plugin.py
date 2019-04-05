@@ -1,22 +1,21 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+from abc import ABCMeta, abstractmethod
 
 from zmon_worker_monitor.adapters.ibase_plugin import IBasePlugin
 
-from abc import ABCMeta, abstractmethod
 import colorsys
 
 
 class IColorPlugin(IBasePlugin, metaclass=ABCMeta):
-
     """
     Example Base Plugin Interface (Adapter)
     Extend it to create a plugin to deal with trendy fashion colors in a country. :)
     """
 
     def __init__(self):
-        super(IColorPlugin, self).__init__()
+        super().__init__()
         self.country = None
         self.color_rgb = {
             'black': (0, 0, 0),

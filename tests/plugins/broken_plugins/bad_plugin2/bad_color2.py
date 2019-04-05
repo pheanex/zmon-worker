@@ -15,7 +15,7 @@ class BadColorPlugin2(IColorPlugin):
     """
 
     def __init__(self):
-        super(BadColorPlugin2, self).__init__()
+        super().__init__()
         self.country = 'germany'
         self.main_fashion_sites = None
 

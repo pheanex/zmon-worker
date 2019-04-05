@@ -13,7 +13,7 @@ from zmon_worker_monitor import plugin_manager
 
 class JobsFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(JobsFactory, self).__init__()
+        super().__init__()
         # fields from dependencies: plugin depends 1 other plugin
         self.http_factory = None
 

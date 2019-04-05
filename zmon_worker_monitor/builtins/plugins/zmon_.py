@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 class ZmonFactory(IFunctionFactoryPlugin):
 
     def __init__(self):
-        super(ZmonFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

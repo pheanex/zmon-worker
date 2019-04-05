@@ -11,7 +11,7 @@ class IFunctionFactoryPlugin(IBasePlugin, metaclass=ABCMeta):
     """
 
     def __init__(self):
-        super(IFunctionFactoryPlugin, self).__init__()
+        super().__init__()
 
     @abstractmethod
     def create(self, factory_ctx):

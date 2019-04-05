@@ -56,7 +56,7 @@ class ProcessApi(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument('key', choices=('name', 'proc_name', 'pid'), default='name')
-        super(ProcessApi, self).__init__()
+        super().__init__()
 
     @swagger.operation(
         summary='Get Process by ID',
@@ -110,7 +110,7 @@ class StatusListApi(Resource):
                                  help='time interval given in time units (defaults to %s s)' % self.default_interval)
         self.parser.add_argument('units', choices=('seconds', 'minutes', 'hours', 'days'), default='seconds',
                                  help='choices=(seconds, minutes, hours, days). defaults to seconds')
-        super(StatusListApi, self).__init__()
+        super().__init__()
 
     @swagger.operation(
         summary='System Summary View',

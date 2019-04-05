@@ -33,7 +33,7 @@ DATAPOINTS_ENDPOINT = 'api/v1/datapoints/query'
 
 class HistoryFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(HistoryFactory, self).__init__()
+        super().__init__()
         # fields from configuration
 
     def configure(self, conf):

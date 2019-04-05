@@ -9,7 +9,7 @@ from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactor
 
 class WhoisFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(WhoisFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

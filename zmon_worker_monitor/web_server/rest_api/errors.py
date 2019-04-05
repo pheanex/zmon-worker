@@ -24,4 +24,4 @@ class ServerError(BaseError):
 
 class UserError(BaseError):
     def __init__(self, message='', code=404, log='INFO', previous_tb=''):
-        super(UserError, self).__init__(message=message, code=code, log=log, previous_tb=previous_tb)
+        super().__init__(message=message, code=code, log=log, previous_tb=previous_tb)

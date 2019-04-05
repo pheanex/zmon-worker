@@ -24,7 +24,7 @@ logger = logging.getLogger('zmon-worker.cloudwatch')
 
 class CloudwatchWrapperFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(CloudwatchWrapperFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         return

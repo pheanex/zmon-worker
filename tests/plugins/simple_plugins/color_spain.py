@@ -13,7 +13,7 @@ class ColorSpainPlugin(IColorPlugin):
     """
 
     def __init__(self):
-        super(ColorSpainPlugin, self).__init__()
+        super().__init__()
         self.country = 'spain'
 
     def configure(self, conf):

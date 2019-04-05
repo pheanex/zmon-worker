@@ -12,7 +12,7 @@ from zmon_worker_monitor import plugin_manager
 
 class EventlogFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(EventlogFactory, self).__init__()
+        super().__init__()
         # fields from configuration
         self.eventlog_url = None
         # fields from dependencies: plugin depends 1 other plugin

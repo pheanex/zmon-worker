@@ -345,4 +345,4 @@ def test_main_task_sampling_rate(monkeypatch, sampling_config, check_id, is_aler
     sampled = len([s for s in results if s])
 
     # We give some margin of error due to probabilistic non-uniform sampling
-    assert sampled >= 5 and sampled <= 20
+    assert sampled >= 3 and sampled <= 20

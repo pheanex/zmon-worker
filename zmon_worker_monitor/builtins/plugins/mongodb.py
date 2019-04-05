@@ -13,7 +13,7 @@ logger = logging.getLogger('zmon-worker.mongodb-function')
 
 class MongoDBFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(MongoDBFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

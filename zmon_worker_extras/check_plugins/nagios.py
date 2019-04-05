@@ -25,7 +25,7 @@ EXAMPLE_DISKS_DATA = ('DISK OK - free space: / 80879 MB (69% inode=99%); /dev 64
 
 class NagiosFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(NagiosFactory, self).__init__()
+        super().__init__()
 
         # fields from config
         self._exarpc_user = None

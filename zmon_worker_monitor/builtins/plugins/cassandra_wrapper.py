@@ -13,7 +13,7 @@ logger = logging.getLogger('zmon-worker.cassandra-function')
 
 class CassandraFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(CassandraFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

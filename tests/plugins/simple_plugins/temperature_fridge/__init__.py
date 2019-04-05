@@ -26,7 +26,7 @@ class TempFridgePlugin(ITemperaturePlugin):
     """
 
     def __init__(self):
-        super(TempFridgePlugin, self).__init__()
+        super().__init__()
         self.device = 'fridge'
         self.fridge_ip = None
         # show we can distribute our logic in submodules

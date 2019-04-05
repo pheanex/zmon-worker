@@ -27,7 +27,7 @@ tokens.start()
 
 class KairosdbFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(KairosdbFactory, self).__init__()
+        super().__init__()
         self._url = None
 
     def configure(self, conf):

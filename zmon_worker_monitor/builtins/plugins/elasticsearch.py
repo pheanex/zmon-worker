@@ -33,7 +33,7 @@ TYPE_COUNT = '_count'
 
 class ElasticsearchFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(ElasticsearchFactory, self).__init__()
+        super().__init__()
 
         self._url = None
 

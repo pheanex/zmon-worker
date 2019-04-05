@@ -19,7 +19,7 @@ class ITemperaturePlugin(IBasePlugin, metaclass=ABCMeta):
     UNIT_FAHRENHEIT = '_UNIT_FAHRENHEIT_'
 
     def __init__(self):
-        super(ITemperaturePlugin, self).__init__()
+        super().__init__()
         self.device = None
         self.unit = self.UNIT_CELSIUS
         self.readings = OrderedDict()

@@ -44,7 +44,7 @@ STATISTICS_FRIENDLY_KEY_NAMES = {'statistics_entries': 'entries',
 
 class LdapFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(LdapFactory, self).__init__()
+        super().__init__()
         # fields from config
         self._ldapuser = None
         self._ldappass = None

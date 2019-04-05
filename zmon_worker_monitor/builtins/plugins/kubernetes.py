@@ -21,7 +21,7 @@ logger = logging.getLogger('zmon-worker.kubernetes-function')
 
 class KubernetesFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(KubernetesFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

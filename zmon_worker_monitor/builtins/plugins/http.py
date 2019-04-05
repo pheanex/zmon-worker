@@ -35,7 +35,7 @@ ZMON_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 class HttpFactory(IFunctionFactoryPlugin):
     def __init__(self):
-        super(HttpFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """

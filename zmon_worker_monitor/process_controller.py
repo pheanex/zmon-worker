@@ -309,7 +309,7 @@ class ProcessPlus(Process):
 
         self.logger = logging.getLogger(__name__)
 
-        super(ProcessPlus, self).__init__(target=self.target, args=self.args, kwargs=self.kwargs)
+        super().__init__(target=self.target, args=self.args, kwargs=self.kwargs)
 
     @property
     def abnormal_termination(self):
@@ -505,7 +505,7 @@ class ProcessPlus(Process):
     def start(self):
         self.stats['start_time'] = time.time()
         self.stats['start_time_str'] = self._time2str(self.stats['start_time'])
-        super(ProcessPlus, self).start()
+        super().start()
 
     def terminate_plus(self, kill_wait=0.5):
         success = False

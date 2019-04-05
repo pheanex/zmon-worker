@@ -16,7 +16,7 @@ logging.getLogger('botocore').setLevel(logging.WARN)
 
 class S3BucketWrapper(IFunctionFactoryPlugin):
     def __init__(self):
-        super(S3BucketWrapper, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         return

@@ -12,7 +12,7 @@ logging.getLogger('botocore').setLevel(logging.WARN)
 class EBSWrapperFactory(IFunctionFactoryPlugin):
 
     def __init__(self):
-        super(EBSWrapperFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         return

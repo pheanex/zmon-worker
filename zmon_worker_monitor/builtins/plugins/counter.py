@@ -15,7 +15,7 @@ ROUND_SECONDS_DIGITS = 6
 class CounterFactory(IFunctionFactoryPlugin):
 
     def __init__(self):
-        super(CounterFactory, self).__init__()
+        super().__init__()
 
     def configure(self, conf):
         """
