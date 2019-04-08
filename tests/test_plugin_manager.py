@@ -4,14 +4,15 @@
 import os
 import traceback
 import unittest
-from mock import patch
+import importlib
 import time
+
+from mock import patch
 
 from zmon_worker_monitor.adapters.ifunctionfactory_plugin import IFunctionFactoryPlugin
 from zmon_worker_monitor import plugin_manager
 from .plugins.icolor_base_plugin import IColorPlugin
 from .plugins.itemperature_base_plugin import ITemperaturePlugin
-import importlib
 
 
 def simple_plugin_dir_abs_path(*suffixes):

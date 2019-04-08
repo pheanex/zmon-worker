@@ -14,9 +14,10 @@ Jinja2==2.10
 jsonpath-rw==1.4.0
 MarkupSafe==1.0
 numpy==1.15.1
-opentracing>=1.2.2,<2
 opentracing-utils>=0.14,<1
+opentracing>=1.2.2,<2
 prometheus-client==0.3.1
+psycopg2==2.7.7
 pykube==0.15.0
 pymemcache>=1.4.3
 pymongo==3.0.3
@@ -34,4 +35,4 @@ setproctitle==1.1.10
 stups-tokens>=1.0.14,<2
 subprocess32==3.5.2
 timeperiod2==0.1
-Yapsy==1.11.223
+Yapsy>=1.11.223,<2
