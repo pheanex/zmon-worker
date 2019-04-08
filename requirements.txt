@@ -35,4 +35,4 @@ setproctitle==1.1.10
 stups-tokens>=1.0.14,<2
 subprocess32==3.5.2
 timeperiod2==0.1
-Yapsy>=1.11.223,<2
+Yapsy==1.11.223
