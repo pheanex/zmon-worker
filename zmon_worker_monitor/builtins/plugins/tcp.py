@@ -28,7 +28,7 @@ class TcpFactory(IFunctionFactoryPlugin):
         return propartial(TcpWrapper, host=factory_ctx['host'])
 
 
-class TcpWrapper(object):
+class TcpWrapper:
 
     def __init__(self, host, timeout=10):
         self.host = host

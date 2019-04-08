@@ -40,7 +40,7 @@ class JobsFactory(IFunctionFactoryPlugin):
                           project=factory_ctx['entity'].get('name'))
 
 
-class JobsWrapper(object):
+class JobsWrapper:
     def __init__(self, http_wrapper, environment, project, **kwargs):
         self.url = 'https://deployctl.example.com/jobs/history.json/{}/{}'.format(environment, project)
         self.__http = http_wrapper

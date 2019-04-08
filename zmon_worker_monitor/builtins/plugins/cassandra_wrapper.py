@@ -37,7 +37,7 @@ class CassandraFactory(IFunctionFactoryPlugin):
         return propartial(CassandraWrapper, node=seeds, username=self._username, password=self._password)
 
 
-class CassandraWrapper(object):
+class CassandraWrapper:
     def __init__(self, node, keyspace, username=None, password=None, port=9042, connect_timeout=1, protocol_version=3):
         # for now using a single host / node should be seed nodes or at least available nodes
 

@@ -31,7 +31,7 @@ class MongoDBFactory(IFunctionFactoryPlugin):
         return propartial(MongoDBWrapper, host=factory_ctx.get('host'))
 
 
-class MongoDBWrapper(object):
+class MongoDBWrapper:
     def __init__(self, host, port=27017):
         if not host:
             raise ConfigurationError(

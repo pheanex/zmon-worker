@@ -53,7 +53,7 @@ class ElasticsearchFactory(IFunctionFactoryPlugin):
         return propartial(ElasticsearchWrapper, url=self._url)
 
 
-class ElasticsearchWrapper(object):
+class ElasticsearchWrapper:
     def __init__(self, url=None, timeout=10, oauth2=False):
         if not url:
             raise ConfigurationError('Elasticsearch plugin improperly configured. URL is required!')

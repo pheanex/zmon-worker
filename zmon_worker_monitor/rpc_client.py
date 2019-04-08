@@ -38,7 +38,7 @@ _cmd_struct = {
 }
 
 
-class RpcClientPlus(object):
+class RpcClientPlus:
     """
     A thin wrapper around Python lib rpc client: xmlrpclib.ServerProxy
     It can call RPC methods with keyword arguments (only for ZMON's RPC server).

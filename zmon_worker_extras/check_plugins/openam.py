@@ -40,7 +40,7 @@ class OpenAMFactory(IFunctionFactoryPlugin):
         return propartial(OpenAMWrapper, url=self.openam_base_url, user=self.username, password=self.__password)
 
 
-class OpenAMWrapper(object):
+class OpenAMWrapper:
     def __init__(self, url, user=None, password=None, params=None, timeout=5, verify=True, headers=None):
         self.url = url
         self.params = params or {}

@@ -25,7 +25,7 @@ from .flags import MONITOR_RESTART, MONITOR_KILL_REQ, MONITOR_PING, MONITOR_NONE
 FLOAT_DIGITS = 5
 
 
-class ProcessController(object):
+class ProcessController:
     """
     Class to handle a bunch of child processes
     what can it do:
@@ -141,7 +141,7 @@ class ProcessController(object):
         self.proc_group.stop_action_loop()
 
 
-class SimpleMethodCacheInMemory(object):
+class SimpleMethodCacheInMemory:
     """
     Simple cache-like decorator for class methods (receiving self as first argument).
     Do not use it for functions, classmethods or staticmethods.
@@ -553,11 +553,11 @@ class ProcessPlus(Process):
 
     @classmethod
     def _func2str(cls, t):
-        return pickle.dumps(t, protocol=0) if callable(t) else t
+        return pickle.dumps(t, protocol=0).decode('utf-8') if callable(t) else t
 
     @classmethod
     def _str2func(cls, str_t):
-        return pickle.loads(str_t)
+        return pickle.loads(bytes(str_t, 'utf-8'))
 
     def to_dict(self, serialize_all=False):
         self.stats = self._updated_stats()

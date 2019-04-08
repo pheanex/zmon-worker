@@ -39,7 +39,7 @@ class KubernetesFactory(IFunctionFactoryPlugin):
         return propartial(KubernetesWrapper)
 
 
-class KubernetesWrapper(object):
+class KubernetesWrapper:
     def __init__(self, namespace='default'):
         self.__namespace = namespace
 

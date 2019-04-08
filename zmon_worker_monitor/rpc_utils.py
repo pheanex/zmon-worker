@@ -13,7 +13,7 @@ from xmlrpc.server import SimpleXMLRPCRequestHandler
 import logging
 
 
-class RpcProxy(object):
+class RpcProxy:
     """
     This is a base class to subclass in order to expose an instance object through remote RPC
     It serves as a container for some idiosyncrasies of Python XML_RPC

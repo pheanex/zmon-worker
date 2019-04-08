@@ -46,7 +46,7 @@ class KairosdbFactory(IFunctionFactoryPlugin):
         return propartial(KairosdbWrapper, url=self._url)
 
 
-class KairosdbWrapper(object):
+class KairosdbWrapper:
     def __init__(self, url, oauth2=False):
         if not url:
             raise ConfigurationError('KairosDB wrapper improperly configured. URL is missing!')

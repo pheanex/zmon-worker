@@ -23,7 +23,7 @@ class _ThreadLocal(thread_local):
     instance = None
 
 
-class RedisConnHandler(object):
+class RedisConnHandler:
 
     """
     This is a connection manager for redis implemented as a context handler. When used inside a with statement

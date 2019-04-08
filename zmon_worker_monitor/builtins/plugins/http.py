@@ -150,7 +150,7 @@ def map_spring_boot_metrics(j, prefix):
     return r
 
 
-class HttpWrapper(object):
+class HttpWrapper:
     def __init__(
             self,
             url,

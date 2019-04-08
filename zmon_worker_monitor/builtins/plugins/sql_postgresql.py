@@ -79,7 +79,7 @@ def make_safe(s):
     return NON_SAFE_CHARS.sub('', s)
 
 
-class SqlWrapper(object):
+class SqlWrapper:
     '''Shard-aware SQL adapter
     sql().execute('SELECT 1').result()
     '''

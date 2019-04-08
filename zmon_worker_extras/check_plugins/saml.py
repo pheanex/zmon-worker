@@ -42,7 +42,7 @@ class SAMLFactory(IFunctionFactoryPlugin):
         return propartial(SAMLWrapper, url=self.saml_url, user=self.username, password=self.__password)
 
 
-class SAMLWrapper(object):
+class SAMLWrapper:
     def __init__(self, url, user=None, password=None, timeout=10, verify=True, headers=None):
         self.url = url
         self.username = user

@@ -26,7 +26,7 @@ class DnsFactory(IFunctionFactoryPlugin):
         return propartial(DnsWrapper, host=factory_ctx['host'])
 
 
-class DnsWrapper(object):
+class DnsWrapper:
 
     def __init__(self, host, timeout=10):
         self.host = host

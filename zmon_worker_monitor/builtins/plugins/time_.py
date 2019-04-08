@@ -29,7 +29,7 @@ class TimeFactory(IFunctionFactoryPlugin):
         return propartial(TimeWrapper)
 
 
-class TimeWrapper(object):
+class TimeWrapper:
     def __init__(self, spec='now', utc=False):
         now = (datetime.utcnow() if utc else datetime.now())
 

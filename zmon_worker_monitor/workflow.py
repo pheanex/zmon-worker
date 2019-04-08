@@ -329,7 +329,7 @@ def process_message(queue, known_tasks, reactor, msg_obj, current_span, sampling
     return True
 
 
-class FlowControlReactor(object):
+class FlowControlReactor:
     """
     Implements a singleton object with a permanently running action loop, that can communicate with the
     parent process (ProcessController) to request certain actions or submit information about the health

@@ -57,7 +57,7 @@ def _import_db_driver():
                 print('Warning: Import of module {} failed: {}'.format(module, e))
 
 
-class MySqlWrapper(object):
+class MySqlWrapper:
     '''Shard-aware SQL adapter
     sql().execute('SELECT 1').result()
     '''

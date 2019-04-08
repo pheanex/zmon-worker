@@ -45,7 +45,7 @@ def matches(dimensions, filters):
     return True
 
 
-class CloudwatchWrapper(object):
+class CloudwatchWrapper:
     def __init__(self, region=None, assume_role_arn=None):
         if not region:
             region = get_instance_identity_document()['region']

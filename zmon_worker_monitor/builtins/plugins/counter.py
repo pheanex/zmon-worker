@@ -34,7 +34,7 @@ class CounterFactory(IFunctionFactoryPlugin):
                           redis_host=factory_ctx['redis_host'], redis_port=factory_ctx['redis_port'])
 
 
-class CounterWrapper(object):
+class CounterWrapper:
 
     '''Measure increasing counts (per second) by saving the last value in Redis'''
 

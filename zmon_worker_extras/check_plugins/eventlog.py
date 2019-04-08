@@ -41,7 +41,7 @@ class EventlogFactory(IFunctionFactoryPlugin):
                           url=self.eventlog_url)
 
 
-class EventLogWrapper(object):
+class EventLogWrapper:
     '''Convenience wrapper to access EventLog counts'''
 
     def __init__(self, http_wrapper, url):

@@ -42,7 +42,7 @@ class JoblocksFactory(IFunctionFactoryPlugin):
         return propartial(JoblocksWrapper, cmdb_url=self.cmdb_url, project=factory_ctx['entity'].get('name'))
 
 
-class JoblocksWrapper(object):
+class JoblocksWrapper:
     LOCKING_NODE_ROLE_ID = 118
     ALLOCATED_STATUS_ID = 6000
     DEFAULT_EXPECTED_DURATION = 60000  # [ms]

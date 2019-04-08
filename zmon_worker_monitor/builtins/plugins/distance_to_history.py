@@ -29,7 +29,7 @@ def flatten(structure, key='', path='', flattened=None):
     return flattened
 
 
-class DistanceWrapper(object):
+class DistanceWrapper:
     def __init__(self, history_wrapper, weeks=4, snap_to_bin=True, bin_size='1h', dict_extractor_path=''):
 
         self.history_wrapper = history_wrapper
@@ -146,7 +146,7 @@ if __name__ == '__main__':
 
     logging.info('flattened dict: %s', flatten({'a': {'b': {'c': 5}}}))
 
-    class HistoryWrapper(object):
+    class HistoryWrapper:
         def __init__(self, check_id, entities=[]):
             self.check_id = check_id
             self.entities = entities

@@ -36,7 +36,7 @@ def create_dict_from_list_of_fields(fields):
     return fields_dict
 
 
-class DataPipelineWrapper(object):
+class DataPipelineWrapper:
     def __init__(self, region=None):
         if not region:
             region = get_instance_identity_document()['region']

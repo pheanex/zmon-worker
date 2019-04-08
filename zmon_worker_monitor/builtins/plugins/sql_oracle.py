@@ -53,7 +53,7 @@ def _import_db_driver():
     return _cx_Oracle
 
 
-class SqlOracleWrapper(object):
+class SqlOracleWrapper:
     '''Oracle SQL adapter
     sql().execute('SELECT 1').result()
     '''

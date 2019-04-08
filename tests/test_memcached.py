@@ -4,13 +4,13 @@ from zmon_worker_monitor.builtins.plugins.memcached import MemcachedWrapper, Con
 from mock import MagicMock
 
 
-class CounterMock(object):
+class CounterMock:
 
     def wrapper(self):
         return CounterWrapperMock
 
 
-class CounterWrapperMock(object):
+class CounterWrapperMock:
 
     def __init__(self, name):
         pass

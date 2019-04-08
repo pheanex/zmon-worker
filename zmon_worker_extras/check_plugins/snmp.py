@@ -38,7 +38,7 @@ class SnmpError(CheckError):
         return 'SNMP Error. Message: {}'.format(self.message)
 
 
-class SnmpWrapper(object):
+class SnmpWrapper:
     def __init__(self, host, community='public', version='v2c', timeout=5):
         if re.match(r'^[0-9]+$', str(timeout)):
             self.timeout = timeout

@@ -30,7 +30,7 @@ class S3BucketWrapper(IFunctionFactoryPlugin):
         return propartial(S3Wrapper, region=factory_ctx.get('entity').get('region', None))
 
 
-class S3Wrapper(object):
+class S3Wrapper:
     def __init__(self, region=None):
         if not region:
             region = get_instance_identity_document()['region']
@@ -100,7 +100,7 @@ class S3Wrapper(object):
             return False
 
 
-class S3Object(object):
+class S3Object:
 
     def __init__(self, key_value):
         self.__key_value = key_value
@@ -140,7 +140,7 @@ class S3Object(object):
             return -1
 
 
-class S3ObjectMetadata(object):
+class S3ObjectMetadata:
 
     def __init__(self, response):
         self.__response = response
@@ -163,7 +163,7 @@ class S3ObjectMetadata(object):
             return -1
 
 
-class S3FileList(object):
+class S3FileList:
 
     def __init__(self, response):
         self.__response = response

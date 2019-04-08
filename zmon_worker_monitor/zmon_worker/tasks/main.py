@@ -754,7 +754,7 @@ def build_default_context():
     }
 
 
-class MainTask(object):
+class MainTask:
     abstract = True
     _host = 'localhost'
     _port = 6379

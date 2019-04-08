@@ -64,7 +64,7 @@ def memory_usage_percentage(data):
     return round(100. * data['used'] / data['max'], 2)
 
 
-class ZomcatWrapper(object):
+class ZomcatWrapper:
 
     def __init__(self, host, instance, http, jmx, counter):
         '''expects ready to use "partials" for http, jmx and counter'''

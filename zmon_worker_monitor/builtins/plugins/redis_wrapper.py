@@ -65,7 +65,7 @@ class RedisFactory(IFunctionFactoryPlugin):
         )
 
 
-class RedisWrapper(object):
+class RedisWrapper:
     '''Class to allow only readonly access to underlying redis connection'''
 
     def __init__(self, counter, host, port=6379, db=0, password=None, socket_connect_timeout=1, socket_timeout=5):

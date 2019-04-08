@@ -94,7 +94,7 @@ def fix_sub32_exc(e):
     return e
 
 
-class NagiosWrapper(object):
+class NagiosWrapper:
     def __init__(self, host, exasol_user='nagios', exasol_password='', lounge_mysql_user='nagios',
                  lounge_mysql_password='', hetcrawler_proxy_user='', hetcrawler_proxy_pass=''):
         self.host = host

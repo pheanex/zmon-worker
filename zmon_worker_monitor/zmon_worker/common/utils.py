@@ -27,7 +27,7 @@ def flatten(structure, key='', path='', flattened=None):
     return flattened
 
 
-class PeriodicBufferedAction(object):
+class PeriodicBufferedAction:
     def __init__(self, action, action_name=None, retries=5, t_wait=10, t_random_fraction=0.5):
         self.log = logging.getLogger(__name__)
         self._stop = True

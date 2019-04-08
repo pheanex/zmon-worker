@@ -44,7 +44,7 @@ class ProcessControllerProxy(rpc_utils.RpcProxy):
         self.get_exposed_obj().terminate_all_processes()
 
 
-class MainProcess(object):
+class MainProcess:
 
     def __init__(self):
         signal.signal(signal.SIGTERM, sigterm_handler)

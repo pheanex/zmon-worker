@@ -4,7 +4,7 @@
 import logging
 
 
-class BaseNotification(object):
+class BaseNotification:
     _config = {}
 
     _EVENTS = None

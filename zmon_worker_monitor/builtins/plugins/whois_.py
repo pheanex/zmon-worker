@@ -27,7 +27,7 @@ class WhoisFactory(IFunctionFactoryPlugin):
         return propartial(WhoisWrapper, host=factory_ctx['host'])
 
 
-class WhoisWrapper(object):
+class WhoisWrapper:
     def __init__(self, host, timeout=10):
         if not host:
             raise ConfigurationError('Whois wrapper improperly configured. Valid host is required!')

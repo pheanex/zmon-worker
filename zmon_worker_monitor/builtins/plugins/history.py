@@ -97,7 +97,7 @@ def get_request(check_id, entities, time_from, time_to, aggregator='avg', sampli
     return r
 
 
-class HistoryWrapper(object):
+class HistoryWrapper:
     def __init__(self, url=None, check_id='', entities=None, oauth2=False):
         if not url:
             raise ConfigurationError('History wrapper improperly configured. URL is required.')

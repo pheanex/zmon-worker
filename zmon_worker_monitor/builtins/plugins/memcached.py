@@ -71,7 +71,7 @@ class MemcachedFactory(IFunctionFactoryPlugin):
         return propartial(MemcachedWrapper, counter=self.counter_factory.create(factory_ctx), host=factory_ctx['host'])
 
 
-class MemcachedWrapper(object):
+class MemcachedWrapper:
     '''Class to allow readonly access to underlying memcached connection'''
 
     def __init__(self, counter, host, port=11211, socket_connect_timeout=1):

@@ -1,10 +1,8 @@
-
 import logging
 import pytest
 import time
-# from mock import MagicMock
+import json
 
-# import zmon_worker_monitor
 from zmon_worker_monitor import process_controller
 from zmon_worker_monitor.flags import MONITOR_RESTART, MONITOR_NONE, MONITOR_PING, MONITOR_KILL_REQ
 
@@ -25,7 +23,7 @@ def test_action_decorator(monkeypatch):
     t_wait_method_2 = 0.2
     some_flag = 16
 
-    class FibClass(object):
+    class FibClass:
         """
         Object that produces an endless stream of possibly repeated numbers from the fibonacci series.
         Numbers increase only after wait_sec, as defined with the ProcAction decorator
@@ -765,7 +763,6 @@ def test_process_plus_event_aggregations(monkeypatch):
 
 
 def test_process_group(monkeypatch):
-
     # Deactivate cache. Actions are decorated with register(), which is a reference of our cache decorator
     monkeypatch.setattr('zmon_worker_monitor.process_controller.SimpleMethodCacheInMemory.shortcut_cache', True)
 
@@ -913,3 +910,38 @@ def test_process_group_health(monkeypatch):
     pg.terminate_all()
 
     assert len(pg) == pg.total_processes() == 0
+
+
+def test_process_group_processes_view(monkeypatch):
+    # Deactivate cache. Actions are decorated with register(), which is a reference of our cache decorator
+    monkeypatch.setattr('zmon_worker_monitor.process_controller.SimpleMethodCacheInMemory.shortcut_cache', True)
+
+    # Reset the Mock counter, this test rely on mock generation counter starting from 1
+    NonSpawningProcessPlus.reset_mock_counter()
+
+    action_interval = 0.5
+    num_procs = 2
+
+    # create our process_group, a dict like object mapping proc_name -> objProcessPlus
+    pg = process_controller.ProcessGroup(group_name='main', process_plus_impl=NonSpawningProcessPlus)
+
+    # start action loop to supervise and monitor
+    pg.start_action_loop(interval=action_interval)
+
+    # group has no running processes yet
+    assert len(pg) == pg.total_processes() == 0
+
+    # spawn a num_procs-1 processes with monitoring and supervision capabilities (this is how we start the workers)
+    pg.spawn_many(num_procs, target=target, args=(1, 2), kwargs={"a": 1, "b": 2},
+                  flags=MONITOR_RESTART | MONITOR_KILL_REQ | MONITOR_PING)
+
+    assert len(pg) == pg.total_processes() == num_procs
+
+    r = pg.processes_view()
+    json.dumps(r)
+
+    r = pg.status_view()
+    json.dumps(r)
+
+    r = pg.is_healthy()
+    json.dumps(r)

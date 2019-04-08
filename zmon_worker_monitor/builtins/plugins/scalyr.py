@@ -33,7 +33,7 @@ class ScalyrWrapperFactory(IFunctionFactoryPlugin):
         return propartial(ScalyrWrapper, read_key=self.read_key, scalyr_region=self.scalyr_region)
 
 
-class ScalyrWrapper(object):
+class ScalyrWrapper:
     def __init__(self, read_key, scalyr_region=None):
         scalyr_prefix = SCALYR_URL_PREFIX_US
 

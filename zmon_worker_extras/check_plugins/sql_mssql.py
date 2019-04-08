@@ -52,7 +52,7 @@ def _import_db_driver():
     return _cx_MsSql
 
 
-class MsSqlWrapper(object):
+class MsSqlWrapper:
     # Note: Timeout must be in seconds
     def __init__(self, host, port, database, user='robot_zmon', password='', enabled=True, timeout=60):
         self.__stmt = None

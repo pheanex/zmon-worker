@@ -26,7 +26,7 @@ class EBSWrapperFactory(IFunctionFactoryPlugin):
         return propartial(EBSWrapper, region=factory_ctx.get('entity').get('region', None))
 
 
-class EBSWrapper(object):
+class EBSWrapper:
 
     def __init__(self, region=None):
         if not region:
@@ -49,7 +49,7 @@ class EBSWrapper(object):
         return EBSSnapshotsList(response)
 
 
-class EBSSnapshotsList(object):
+class EBSSnapshotsList:
 
     def __init__(self, response):
         self.__response = response

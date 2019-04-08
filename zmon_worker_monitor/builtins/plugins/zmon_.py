@@ -31,7 +31,7 @@ class ZmonFactory(IFunctionFactoryPlugin):
         return propartial(ZmonWrapper, factory_ctx['redis_host'], factory_ctx['redis_port'])
 
 
-class ZmonWrapper(object):
+class ZmonWrapper:
 
     ZMON_ALERTS_ENTITIES_PATTERN = 'zmon:alerts:*:entities'
 

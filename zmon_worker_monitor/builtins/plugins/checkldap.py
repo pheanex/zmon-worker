@@ -80,7 +80,7 @@ class DuplicateBindException(Exception):
     pass
 
 
-class LdapWrapper(object):
+class LdapWrapper:
     def __init__(
             self,
             host=None,

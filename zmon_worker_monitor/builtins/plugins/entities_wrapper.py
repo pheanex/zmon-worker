@@ -50,7 +50,7 @@ class EntitiesWrapperFactory(IFunctionFactoryPlugin):
                           service_url=self.service_url, oauth2=self.oauth2)
 
 
-class EntitiesWrapper(object):
+class EntitiesWrapper:
     def __init__(self, service_url, infrastructure_account, verify=True, oauth2=False):
 
         if not service_url:

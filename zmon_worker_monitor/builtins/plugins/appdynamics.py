@@ -82,7 +82,7 @@ class AppdynamicsFactory(IFunctionFactoryPlugin):
             index_prefix=self._index_prefix)
 
 
-class AppdynamicsWrapper(object):
+class AppdynamicsWrapper:
     def __init__(self, url=None, username=None, password=None, es_url=None, index_prefix=''):
         if not url:
             raise RuntimeError('AppDynamics plugin improperly configured. URL is required!')

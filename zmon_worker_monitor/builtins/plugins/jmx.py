@@ -36,7 +36,7 @@ class JmxFactory(IFunctionFactoryPlugin):
                           port=factory_ctx['jmx_port'])
 
 
-class JmxWrapper(object):
+class JmxWrapper:
     def __init__(self, jmxqueryhost, jmxqueryport, host, port, timeout=5):
         if not jmxqueryhost or not jmxqueryport:
             raise ConfigurationError('JMX wrapper improperly configured. Missing jmxqueryhost & jmxqueryport.')

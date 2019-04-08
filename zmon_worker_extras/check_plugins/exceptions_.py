@@ -43,7 +43,7 @@ class ExceptionsFactory(IFunctionFactoryPlugin):
                           project=project)
 
 
-class ExceptionsWrapper(object):
+class ExceptionsWrapper:
     def __init__(self, http_wrapper, host=None, instance=None, project=None):
         self.__http = http_wrapper
         self.url = 'https://exceptions.example.com/'

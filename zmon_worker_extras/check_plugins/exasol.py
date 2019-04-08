@@ -38,7 +38,7 @@ class ExaplusFactory(IFunctionFactoryPlugin):
                           user=self._exacrm_user, timeout=factory_ctx.get('soft_time_limit', 58))
 
 
-class ExaplusWrapper(object):
+class ExaplusWrapper:
     def __init__(self, cluster, user='ZALANDO_NAGIOS', password='', schema=False, timeout=58):
         self._err = ''
         self._out = ''
