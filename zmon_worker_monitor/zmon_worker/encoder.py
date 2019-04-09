@@ -22,7 +22,7 @@ class JsonDataEncoder(json.JSONEncoder):
         'null'
         >>> JsonDataEncoder().encode(numpy.Infinity)
         '"Infinity"'
-        >>> JsonDataEncoder().encode(b'spaß')
+        >>> JsonDataEncoder().encode(b'spa\xc3\x9f')
         '"spaß"'
         '''
         if isinstance(o, (datetime.datetime, datetime.date, datetime.time)):
