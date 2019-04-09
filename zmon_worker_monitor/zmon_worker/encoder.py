@@ -22,8 +22,8 @@ class JsonDataEncoder(json.JSONEncoder):
         'null'
         >>> JsonDataEncoder().encode(numpy.Infinity)
         '"Infinity"'
-        >>> JsonDataEncoder().encode(b'spa\xc3\x9f')
-        '"spaß"'
+        >>> JsonDataEncoder().encode(b'bytes')
+        '"bytes"'
         '''
         if isinstance(o, (datetime.datetime, datetime.date, datetime.time)):
             return o.isoformat()
