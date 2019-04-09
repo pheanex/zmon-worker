@@ -1346,8 +1346,11 @@ class MainTask:
             raise CheckError(str(e))
         except (SecurityError, InsufficientPermissionsError) as e:
             raise(e)
-        except Exception:
-            raise Exception(traceback.format_exc())
+        except Exception as e:
+            exc_str = str(e)
+            exc = traceback.format_exc().split('\n')
+            tb = '{}\n\n{}\n...\n{}'.format(exc_str, exc[0], '\n'.join(exc[5:]))
+            raise Exception(tb)
 
     def _get_check_result(self, req):
         r = self._get_check_result_internal(req)
