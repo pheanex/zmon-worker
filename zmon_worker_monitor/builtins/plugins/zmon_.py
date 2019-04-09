@@ -39,7 +39,8 @@ class ZmonWrapper:
         if not host:
             raise ConfigurationError('ZMON wrapper improperly configured. Valid redis host is required!')
 
-        self.__redis = redis.StrictRedis(host, port, socket_connect_timeout=1, socket_timeout=5)
+        self.__redis = redis.StrictRedis(host, port, socket_connect_timeout=1, socket_timeout=5,
+                                         charset='utf-8', decode_responses=True)
         self.logger = logger
 
     def check_entities_total(self):

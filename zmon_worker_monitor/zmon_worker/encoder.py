@@ -22,6 +22,8 @@ class JsonDataEncoder(json.JSONEncoder):
         'null'
         >>> JsonDataEncoder().encode(numpy.Infinity)
         '"Infinity"'
+        >>> JsonDataEncoder().encode(b'spaß')
+        '"spaß"'
         '''
         if isinstance(o, (datetime.datetime, datetime.date, datetime.time)):
             return o.isoformat()
@@ -33,6 +35,8 @@ class JsonDataEncoder(json.JSONEncoder):
             return list(o)
         elif isinstance(o, numpy.bool_):
             return bool(o)
+        elif type(o) is bytes:
+            return o.decode('utf-8')
         else:
             return super().default(o)
 

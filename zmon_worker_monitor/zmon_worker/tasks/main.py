@@ -257,6 +257,19 @@ def entity_results(con, check_id, alert_id, count=1):
     return all_results
 
 
+def get_results_user(count=1, con=None, check_id=None, entity_id=None):
+    return [x['value'] for x in get_results(con, check_id, entity_id, count)]
+
+
+def get_results(con, check_id, entity_id, count=1):
+    r = list(map(json.loads, con.lrange('zmon:checks:{}:{}'.format(check_id, entity_id), 0, count - 1)))
+
+    for x in r:
+        x.update({'entity_id': entity_id})
+
+    return r
+
+
 def capture(value=None, captures=None, **kwargs):
     '''
     >>> capture(1, {})
@@ -623,19 +636,6 @@ class Try(Callable):
             return self.try_call()
         except self.exc_cls as e:
             return self.except_call(e)
-
-
-def get_results_user(count=1, con=None, check_id=None, entity_id=None):
-    return [x['value'] for x in get_results(con, check_id, entity_id, count)]
-
-
-def get_results(con, check_id, entity_id, count=1):
-    r = list(map(json.loads, con.lrange('zmon:checks:{}:{}'.format(check_id, entity_id), 0, count - 1)))
-
-    for x in r:
-        x.update({'entity_id': entity_id})
-
-    return r
 
 
 def avg(sequence):

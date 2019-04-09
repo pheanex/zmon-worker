@@ -79,7 +79,9 @@ class RedisWrapper:
             db,
             password,
             socket_connect_timeout=socket_connect_timeout,
-            socket_timeout=socket_timeout
+            socket_timeout=socket_timeout,
+            charset='utf-8',
+            decode_responses=True,
         )
 
     def llen(self, key):

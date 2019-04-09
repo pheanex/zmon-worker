@@ -61,23 +61,25 @@ def test_redis_parametrized(monkeypatch, kwargs):
     def dbsize():
         return STATS['dbsize']
 
-    redisMock = MagicMock()
-    redisMock().dbsize.side_effect = dbsize
-    redisMock().get.side_effect = get
-    redisMock().info.side_effect = info
+    redis_mock = MagicMock()
+    redis_mock().dbsize.side_effect = dbsize
+    redis_mock().get.side_effect = get
+    redis_mock().info.side_effect = info
 
-    monkeypatch.setattr('zmon_worker_monitor.builtins.plugins.redis_wrapper.redis.StrictRedis', redisMock)
-    wrapper = rediswrapper.RedisWrapper(
-        counter=lambda x: x,
-        **kwargs)
+    monkeypatch.setattr('zmon_worker_monitor.builtins.plugins.redis_wrapper.redis.StrictRedis', redis_mock)
+    wrapper = rediswrapper.RedisWrapper(counter=lambda x: x, **kwargs)
+
     assert wrapper.get('foo') == 'bar'
     assert wrapper.get('test') is None
     assert wrapper.statistics() == STATS
-    redisMock.assert_called_with(
+
+    redis_mock.assert_called_with(
         kwargs.get('host'),
         kwargs.get('port'),
         kwargs.get('db', 0),
         kwargs.get('password'),
         socket_connect_timeout=kwargs.get('socket_connect_timeout', 1),
-        socket_timeout=kwargs.get('socket_timeout', 5)
+        socket_timeout=kwargs.get('socket_timeout', 5),
+        charset='utf-8',
+        decode_responses=True
     )

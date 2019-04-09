@@ -193,8 +193,10 @@ def flow_simple_queue_processor(queue='', **execution_context):
 
                 queue, msg = encoded_task
 
-                if msg[:1] != '{':
-                    msg = snappy.decompress(msg)
+                compressed = False
+                if msg[0] != '{':
+                    msg = snappy.decompress(bytes(msg, 'utf-8'))
+                    compressed = True
 
                 msg_obj = json.loads(msg)
 
@@ -203,6 +205,7 @@ def flow_simple_queue_processor(queue='', **execution_context):
 
                 span = extract_tracing_span(trace)
                 span.set_operation_name(OPENTRACING_QUEUE_OPERATION)
+                span.set_tag('compressed', compressed)
 
                 # Get sampling rates. We update every minute.
                 if sampling_config is None or (

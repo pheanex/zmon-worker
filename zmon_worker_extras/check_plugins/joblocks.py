@@ -79,8 +79,14 @@ class JoblocksWrapper:
 
     def results(self, expected_duration=None):
         hosts = self._get_hosts(JoblocksWrapper.LOCKING_NODE_ROLE_ID, JoblocksWrapper.ALLOCATED_STATUS_ID)
-        host_connections = dict((host.hostname, redis.StrictRedis(host=host.hostname)) for host in hosts)
-        host_keys = dict((host, con.keys(self.pattern)) for (host, con) in host_connections.items())
+
+        host_connections = {
+            host.hostname: redis.StrictRedis(host=host.hostname, charset="utf-8", decode_responses=True)
+            for host in hosts
+        }
+
+        host_keys = {host: con.keys(self.pattern) for (host, con) in host_connections.items()}
+
         str_results = []
 
         for host, keys in host_keys.items():
