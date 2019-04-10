@@ -14,7 +14,7 @@ def build_redis_queue_item(check_command):
             'task': 'check_and_notify',
             'args': [{
                 'check_id': 123,
-                'check_name': 'Test Check',
+                'check_name': 'Tëst Check',
                 'entity': {'id': '77', 'type': 'test'},
                 'command': check_command, 'interval': 10},
                 []
@@ -46,6 +46,7 @@ def execute_check(tmpdir, monkeypatch, check_command, expected_strings):
 
     def lpush(key, val):
         data[key] = val
+        print(key, val)
         with open(str(tmpdir) + 'data.json', 'w') as fd:
             json.dump(data, fd)
 

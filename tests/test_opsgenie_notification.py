@@ -28,7 +28,7 @@ HEADERS = {
                          ((True, None, None, None),
                           (True, 'P4', None, None),
                           (False, None, None, None),
-                          (True, None, "override description", None),
+                          (True, None, "override dëscription", None),
                           (True, None, None, {'custom_field': 'values'}))
                          )
 def test_opsgenie_notification(monkeypatch, is_alert, priority, override_description, set_custom_fileds):
@@ -112,9 +112,9 @@ def test_opsgenie_notification(monkeypatch, is_alert, priority, override_descrip
 
     assert r == 0
 
-    URL = URL_CREATE if is_alert else URL_CLOSE.format('ZMON-123')
+    url = URL_CREATE if is_alert else URL_CLOSE.format('ZMON-123')
 
-    post.assert_called_with(URL, data=json.dumps(data, cls=JsonDataEncoder, sort_keys=True), headers=HEADERS, timeout=5,
+    post.assert_called_with(url, data=json.dumps(data, cls=JsonDataEncoder, sort_keys=True), headers=HEADERS, timeout=5,
                             params=params)
 
 
@@ -122,7 +122,7 @@ def test_opsgenie_notification(monkeypatch, is_alert, priority, override_descrip
                          ((True, True, None, None),
                           (True, True, 'P4', None),
                           (False, False, None, None),
-                          (False, True, None, "override description"))
+                          (False, True, None, "override dëscription"))
                          )
 def test_opsgenie_notification_captures(monkeypatch, include_captures, is_alert, priority, override_description):
     post = MagicMock()
@@ -206,9 +206,9 @@ def test_opsgenie_notification_captures(monkeypatch, include_captures, is_alert,
 
     assert r == 0
 
-    URL = URL_CREATE if is_alert else URL_CLOSE.format('ZMON-123')
+    url = URL_CREATE if is_alert else URL_CLOSE.format('ZMON-123')
 
-    post.assert_called_with(URL, data=json.dumps(data, cls=JsonDataEncoder, sort_keys=True), headers=HEADERS, timeout=5,
+    post.assert_called_with(url, data=json.dumps(data, cls=JsonDataEncoder, sort_keys=True), headers=HEADERS, timeout=5,
                             params=params)
 
 

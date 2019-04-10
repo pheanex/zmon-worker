@@ -3,9 +3,9 @@
 
 import os
 import traceback
-import unittest
 import importlib
 import time
+import pytest
 
 from mock import patch
 
@@ -27,170 +27,62 @@ def extras_plugin_dir_abs_path(*suffixes):
     return os.path.abspath(os.path.join(os.path.dirname(__file__), '../zmon_worker_extras/check_plugins', *suffixes))
 
 
-class TestPluginManager(unittest.TestCase):
+def test_load_plugins_twice():
+    """
+    Test that exception is raised if you collect plugins more than once
+    """
+    # reload the plugin
+    importlib.reload(plugin_manager)
 
-    def test_load_plugins_twice(self):
-        """
-        Test that exception is raised if you collect plugins more than once
-        """
-        # reload the plugin
-        importlib.reload(plugin_manager)
+    plugin_manager.init_plugin_manager()  # init plugin manager
 
-        plugin_manager.init_plugin_manager()  # init plugin manager
+    plugin_manager.collect_plugins(load_builtins=True, load_env=False, additional_dirs=None)
 
+    with pytest.raises(plugin_manager.PluginFatalError):
         plugin_manager.collect_plugins(load_builtins=True, load_env=False, additional_dirs=None)
 
-        with self.assertRaises(plugin_manager.PluginFatalError):
-            plugin_manager.collect_plugins(load_builtins=True, load_env=False, additional_dirs=None)
 
-    def test_load_builtin_plugins(self):
-        """
-        Test that city plugin can be fully loaded
-        """
-        # reload the plugin
-        importlib.reload(plugin_manager)
+def test_load_builtin_plugins():
+    """
+    Test that city plugin can be fully loaded
+    """
+    # reload the plugin
+    importlib.reload(plugin_manager)
 
-        plugin_manager.init_plugin_manager()  # init the plugin manager
+    plugin_manager.init_plugin_manager()  # init the plugin manager
 
-        # collect only builtin plugins
-        plugin_manager.collect_plugins(load_builtins=True, load_env=False, additional_dirs=None)
+    # collect only builtin plugins
+    plugin_manager.collect_plugins(load_builtins=True, load_env=False, additional_dirs=None)
 
-        # city plugin is a builtin and is in category entity
-        plugin_name = 'http'
-        plugin_category = 'Function'
+    # city plugin is a builtin and is in category entity
+    plugin_name = 'http'
+    plugin_category = 'Function'
 
-        self.assertIn(plugin_name, plugin_manager.get_all_plugin_names(), 'http plugin name must be found')
+    assert plugin_name in plugin_manager.get_all_plugin_names(), 'http plugin name must be found'
 
-        http_plugin = plugin_manager.get_plugin_by_name(plugin_name, plugin_category)
+    http_plugin = plugin_manager.get_plugin_by_name(plugin_name, plugin_category)
 
-        self.assertIsNotNone(http_plugin, 'http plugin must be under category Function')
-        self.assertEqual(http_plugin.name, plugin_name, 'check plugin name field')
+    assert http_plugin is not None, 'http plugin must be under category Function'
+    assert http_plugin.name == plugin_name, 'check plugin name field'
 
-        # check city plugin object
-        self.assertTrue(hasattr(http_plugin, 'plugin_object'), 'http.plugin_object exists')
-        self.assertIsNotNone(http_plugin.plugin_object, 'http.plugin_object is not None')
-        self.assertTrue(isinstance(plugin_manager.get_plugin_obj_by_name(plugin_name, plugin_category),
-                        IFunctionFactoryPlugin),
-                        'the entity plugin object is instance of IFunctionFactoryPlugin')
+    # check city plugin object
+    assert hasattr(http_plugin, 'plugin_object'), 'http.plugin_object exists'
+    assert http_plugin.plugin_object is not None, 'http.plugin_object is not None'
+    assert isinstance(plugin_manager.get_plugin_obj_by_name(plugin_name, plugin_category), IFunctionFactoryPlugin)
 
-        # check that city plugin object is activated
-        self.assertTrue(http_plugin.is_activated)
-        self.assertEqual(http_plugin.plugin_object.is_activated, http_plugin.is_activated)
+    # check that city plugin object is activated
+    assert http_plugin.is_activated is True
+    assert http_plugin.plugin_object.is_activated == http_plugin.is_activated
 
-        # check that the city plugin object was configured with the path to a data file
-        # self.assertIsNotNone(http_plugin.plugin_object.path, 'city was configured with the path to a data file')
 
-        # check that the city plugin can load its entities data
-        # has_tokyo = False
-        # try:
-        #     entities = http_plugin.plugin_object._get_entities()
-        #     has_tokyo = bool([1 for cdata in entities if cdata['city'] == 'tokyo'])
-        # except Exception:
-        #     pass
-        # self.assertTrue(has_tokyo, 'cities loaded and tokyo is among them')
+@patch.dict(os.environ, {'ZMON_PLUGINS': simple_plugin_dir_abs_path()})
+def test_load_plugins_several_categories():
+    """
+    Test is we can load and correctly locate plugins from several categories
+    First it explores folders from ZMON_PLUGINS env_var, and then from additional_dirs
+    """
+    for test_load_from in ('env_var', 'additional_folders'):
 
-    @patch.dict(os.environ, {'ZMON_PLUGINS': simple_plugin_dir_abs_path()})
-    def test_load_plugins_several_categories(self):
-        """
-        Test is we can load and correctly locate plugins from several categories
-        First it explores folders from ZMON_PLUGINS env_var, and then from additional_dirs
-        """
-        for test_load_from in ('env_var', 'additional_folders'):
-
-            # reload the plugin
-            importlib.reload(plugin_manager)
-
-            # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
-            category_filter = {
-                'Function': IFunctionFactoryPlugin,
-                'Color': IColorPlugin,
-                'Temperature': ITemperaturePlugin,
-            }
-
-            if test_load_from == 'env_var':
-                # init the plugin manager
-                plugin_manager.init_plugin_manager(category_filter=category_filter)
-
-                # collect plugins builtin and explore env_var: ZMON_PLUGINS="/.../tests/plugins/simple_plugins"
-                plugin_manager.collect_plugins(load_builtins=True, load_env=True, additional_dirs=None)
-
-            elif test_load_from == 'additional_folders':
-                # init the plugin manager
-                plugin_manager.init_plugin_manager(category_filter=category_filter)
-
-                test_plugin_dir = simple_plugin_dir_abs_path()
-
-                # collect plugins builtin and explore  additional_dirs: /.../tests/plugins/simple_plugins
-                plugin_manager.collect_plugins(load_builtins=True, load_env=False, additional_dirs=[test_plugin_dir])
-
-            # check categories
-
-            all_categories = plugin_manager.get_all_categories()
-            seen_categories = plugin_manager.get_loaded_plugins_categories()
-
-            self.assertEqual(set(all_categories), set(category_filter.keys()), 'All defined categories are stored')
-            self.assertTrue(len(seen_categories) >= 2 and set(seen_categories).issubset(set(all_categories)),
-                            'found at least 2 categories and they all belong to all defined categories')
-
-            # check known test plugins are loaded
-
-            known_plugin_names = ['http', 'color_spain', 'color_germany', 'temperature_fridge']
-            plugin_names = plugin_manager.get_all_plugin_names()
-
-            self.assertTrue(set(known_plugin_names).issubset(plugin_names), 'All known test plugins are loaded')
-
-            # test get_plugin_obj_by_name() and get_plugin_objs_of_category()
-
-            color_ger = plugin_manager.get_plugin_by_name('color_germany', 'Color')
-            color_ger_obj = plugin_manager.get_plugin_obj_by_name('color_germany', 'Color')
-            self.assertEqual(id(color_ger.plugin_object), id(color_ger_obj), 'locate plugin object works')
-            self.assertEqual(color_ger.plugin_object.country, 'germany', 'located object field values look good')
-            all_color_objs = plugin_manager.get_plugin_objs_of_category('Color')
-            self.assertEqual(id(color_ger_obj), id([obj for obj in all_color_objs if obj.country == 'germany'][0]),
-                             'locate the plugin object in a convoluted way works too')
-
-            # test that color_german plugin was configured with the main fashion sites
-
-            conf_sites_germany = ['www.big_fashion_site.de', 'www.other_fashion_site.de']
-
-            self.assertTrue(set(conf_sites_germany) == set(color_ger_obj.main_fashion_sites), 'object is configured')
-
-            # test that plugin objects run its logic correctly
-
-            color_obj_de = plugin_manager.get_plugin_obj_by_name('color_germany', 'Color')
-            color_obj_es = plugin_manager.get_plugin_obj_by_name('color_spain', 'Color')
-
-            simple_colors_de = ['grey', 'white', 'black']
-            simple_colors_es = ['brown', 'yellow', 'blue']
-
-            col_names_de = color_obj_de.get_season_color_names()
-            col_names_es = color_obj_es.get_season_color_names()
-
-            self.assertEqual(col_names_de, simple_colors_de)
-            self.assertEqual(col_names_es, simple_colors_es)
-
-            # Test also the logic of temperature plugin object, this simulates a bit more complex logic
-            # Temp readings are simulated as a normal distribution centered at -5 and 0.2 sigma (values from config)
-            # we spawn the thread that periodically do temp reading, we wait some intervals and then get the avg temp
-            # Finally we check that T avg is -5 +- 10 sigmas (see local config)
-
-            temp_fridge = plugin_manager.get_plugin_obj_by_name('temperature_fridge', 'Temperature')
-            temp_fridge.start_update()
-            time.sleep(temp_fridge.interval * 20)  # we wait for some temp collection to happen
-            temp_fridge.stop = True
-            tavg = temp_fridge.get_temperature_average()
-            # This test is non-deterministic, but probability of failure is super small, so in practice it is ok
-            self.assertTrue(abs(-5.0 - tavg) < 0.2 * 10, 'the avg temperature is close to -5')
-
-            # test subpackage dependencies can be resolved
-            self.assertEqual(temp_fridge.engine.power_unit, 'Watts')
-
-    @patch.dict(os.environ, {'ZMON_PLUGINS': extras_plugin_dir_abs_path() + ':' + simple_plugin_dir_abs_path()})
-    def test_load_plugins_extras(self):
-        """
-        Test is we can load correctly the extra plugins. Also loads builtins and simple test plugins.
-        Notice we put two folders to ZMON_PLUGINS env var, separated by ':'
-        """
         # reload the plugin
         importlib.reload(plugin_manager)
 
@@ -201,124 +93,184 @@ class TestPluginManager(unittest.TestCase):
             'Temperature': ITemperaturePlugin,
         }
 
-        # init the plugin manager
-        plugin_manager.init_plugin_manager(category_filter=category_filter)
-
-        # collect builtins and explore folder in env var, e.g. ZMON_PLUGINS="/path/one:path/two:/path/three"
-        plugin_manager.collect_plugins(load_builtins=True, load_env=True, additional_dirs=None)
-
-        # check categories
-        all_categories = plugin_manager.get_all_categories()
-        seen_categories = plugin_manager.get_loaded_plugins_categories()
-        self.assertEqual(set(all_categories), set(category_filter.keys()), 'All defined categories are stored')
-
-        self.assertTrue(len(seen_categories) >= 2 and set(seen_categories).issubset(set(all_categories)),
-                        'found at least 2 categories and they all belong to all defined categories')
-
-        # check known test plugins are loaded
-        extra_plugins = ['exacrm', 'job_lock', 'nagios', 'snmp', 'mssql']  # non exhaustive list
-        known_plugin_names = extra_plugins + ['http', 'color_spain', 'color_germany', 'temperature_fridge']
-        plugin_names = plugin_manager.get_all_plugin_names()
-        self.assertTrue(set(known_plugin_names).issubset(plugin_names), 'All known test plugins are loaded')
-
-        # check extra plugins
-        for name, category in zip(extra_plugins, ['Function'] * len(extra_plugins)):
-
-            p = plugin_manager.get_plugin_by_name(name, category)
-            p_obj = plugin_manager.get_plugin_obj_by_name(name, category)
-            self.assertEqual(id(p.plugin_object), id(p_obj), 'locate plugin object works')
-
-            self.assertTrue(p.is_activated)
-            self.assertEqual(p.plugin_object.is_activated, p.is_activated, 'plugin is activated')
-
-            self.assertTrue(isinstance(p_obj, IFunctionFactoryPlugin),
-                            'plugin object is instance of IFunctionFactoryPlugin')
-
-        # test extra plugin are configured according to config file
-        self.assertEqual(plugin_manager.get_plugin_obj_by_name('exacrm', 'Function')._exacrm_cluster, '--secret--',
-                         'exacrm object is configured')
-
-    @patch.dict(os.environ, {'ZMON_PLUGINS': simple_plugin_dir_abs_path()})
-    def test_global_config(self):
-        """
-        Test that the plugin can configure itself from the global config and that global config
-        takes precedence over local config
-        """
-        # reload the plugin
-        importlib.reload(plugin_manager)
-
-        # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
-        category_filter = {
-            'Function': IFunctionFactoryPlugin,
-            'Color': IColorPlugin,
-            'Temperature': ITemperaturePlugin,
-        }
-
-        # init the plugin manager
-        plugin_manager.init_plugin_manager(category_filter=category_filter)
-
-        # inject as global conf to color_german plugin fashion sites different from the local conf
-        global_conf = {
-            'plugin.color_germany.fashion_sites': 'superfashion.de hypefashion.de',
-            'plugin.other_plugin.otherkey': 'this will not be passed to color_germany.configure',
-        }
-
-        # collect plugins builtin and explore env_var: ZMON_PLUGINS="/.../tests/plugins/simple_plugins"
-        plugin_manager.collect_plugins(load_builtins=True, load_env=True, additional_dirs=None,
-                                       global_config=global_conf)
-
-        # test that color_german plugin was configured according to the global conf
-
-        global_conf_sites = ['superfashion.de', 'hypefashion.de']
-
-        color_ger_obj = plugin_manager.get_plugin_obj_by_name('color_germany', 'Color')
-
-        self.assertTrue(set(global_conf_sites) == set(color_ger_obj.main_fashion_sites), 'object is configured')
-
-    @patch.dict(os.environ, {'ZMON_PLUGINS': simple_plugin_dir_abs_path()})
-    def test_load_broken_plugins(self):
-        """
-        Test that we fail predictably on bad plugins and check that we propagate in the exception info to where
-        the error is coming from, either in the exception message or in its traceback
-        """
-
-        for plugin_dir in 'bad_plugin1', 'bad_plugin2', 'bad_plugin3':
-
-            plugin_abs_dir = broken_plugin_dir_abs_path(plugin_dir)
-
-            # reload the plugin
-            importlib.reload(plugin_manager)
-
-            # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
-            category_filter = {
-                'Function': IFunctionFactoryPlugin,
-                'Color': IColorPlugin,
-                'Temperature': ITemperaturePlugin,
-            }
-
+        if test_load_from == 'env_var':
             # init the plugin manager
             plugin_manager.init_plugin_manager(category_filter=category_filter)
 
-            is_raised = False
-            our_plugins_words = ['bad_color', 'badcolor', 'badplugin', 'bad_plugin']
-            try:
-                # collect plugins should fail with our custom fatal exception
-                plugin_manager.collect_plugins(load_builtins=True, load_env=True, additional_dirs=[plugin_abs_dir])
-            except plugin_manager.PluginError as e:
-                is_raised = True
-                exec_all_str = (str(e) + traceback.format_exc()).lower()
-                self.assertTrue(any(s in exec_all_str for s in our_plugins_words),
-                                'Exception info and/or traceback point you to the failing plugin')
+            # collect plugins builtin and explore env_var: ZMON_PLUGINS="/.../tests/plugins/simple_plugins"
+            plugin_manager.collect_plugins(load_builtins=True, load_env=True, additional_dirs=None)
 
-            self.assertTrue(is_raised)
+        elif test_load_from == 'additional_folders':
+            # init the plugin manager
+            plugin_manager.init_plugin_manager(category_filter=category_filter)
 
-    @patch.dict(os.environ, {'ZMON_PLUGINS': simple_plugin_dir_abs_path()})
-    def test_plugins_unsatisfied_requirements(self):
-        """
-        Test that we recognize missing dependencies in requirements.txt files in plugins dirs
-        """
+            test_plugin_dir = simple_plugin_dir_abs_path()
 
-        plugin_abs_dir = broken_plugin_dir_abs_path('plugin_dir_with_requirements')
+            # collect plugins builtin and explore  additional_dirs: /.../tests/plugins/simple_plugins
+            plugin_manager.collect_plugins(load_builtins=True, load_env=False, additional_dirs=[test_plugin_dir])
+
+        # check categories
+
+        all_categories = plugin_manager.get_all_categories()
+        seen_categories = plugin_manager.get_loaded_plugins_categories()
+
+        assert set(all_categories) == set(category_filter.keys()), 'All defined categories are stored'
+        assert len(seen_categories) >= 2 and set(seen_categories).issubset(set(all_categories))
+
+        # check known test plugins are loaded
+
+        known_plugin_names = ['http', 'color_spain', 'color_germany', 'temperature_fridge']
+        plugin_names = plugin_manager.get_all_plugin_names()
+
+        assert set(known_plugin_names).issubset(plugin_names), 'All known test plugins are loaded'
+
+        # test get_plugin_obj_by_name() and get_plugin_objs_of_category()
+
+        color_ger = plugin_manager.get_plugin_by_name('color_germany', 'Color')
+        color_ger_obj = plugin_manager.get_plugin_obj_by_name('color_germany', 'Color')
+
+        assert id(color_ger.plugin_object) == id(color_ger_obj), 'locate plugin object works'
+        assert color_ger.plugin_object.country == 'germany', 'located object field values look good'
+
+        all_color_objs = plugin_manager.get_plugin_objs_of_category('Color')
+        assert id(color_ger_obj) == id([obj for obj in all_color_objs if obj.country == 'germany'][0])
+
+        # test that color_german plugin was configured with the main fashion sites
+
+        conf_sites_germany = ['www.big_fashion_site.de', 'www.other_fashion_site.de']
+
+        assert set(conf_sites_germany) == set(color_ger_obj.main_fashion_sites), 'object is configured'
+
+        # test that plugin objects run its logic correctly
+
+        color_obj_de = plugin_manager.get_plugin_obj_by_name('color_germany', 'Color')
+        color_obj_es = plugin_manager.get_plugin_obj_by_name('color_spain', 'Color')
+
+        simple_colors_de = ['grey', 'white', 'black']
+        simple_colors_es = ['brown', 'yellow', 'blue']
+
+        col_names_de = color_obj_de.get_season_color_names()
+        col_names_es = color_obj_es.get_season_color_names()
+
+        assert col_names_de == simple_colors_de
+        assert col_names_es == simple_colors_es
+
+        # Test also the logic of temperature plugin object, this simulates a bit more complex logic
+        # Temp readings are simulated as a normal distribution centered at -5 and 0.2 sigma (values from config)
+        # we spawn the thread that periodically do temp reading, we wait some intervals and then get the avg temp
+        # Finally we check that T avg is -5 +- 10 sigmas (see local config)
+
+        temp_fridge = plugin_manager.get_plugin_obj_by_name('temperature_fridge', 'Temperature')
+        temp_fridge.start_update()
+        time.sleep(temp_fridge.interval * 20)  # we wait for some temp collection to happen
+        temp_fridge.stop = True
+        tavg = temp_fridge.get_temperature_average()
+        # This test is non-deterministic, but probability of failure is super small, so in practice it is ok
+        assert abs(-5.0 - tavg) < 0.2 * 10, 'the avg temperature is close to -5'
+
+        # test subpackage dependencies can be resolved
+        assert temp_fridge.engine.power_unit == 'Watts'
+
+
+@patch.dict(os.environ, {'ZMON_PLUGINS': extras_plugin_dir_abs_path() + ':' + simple_plugin_dir_abs_path()})
+def test_load_plugins_extras():
+    """
+    Test is we can load correctly the extra plugins. Also loads builtins and simple test plugins.
+    Notice we put two folders to ZMON_PLUGINS env var, separated by ':'
+    """
+    # reload the plugin
+    importlib.reload(plugin_manager)
+
+    # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
+    category_filter = {
+        'Function': IFunctionFactoryPlugin,
+        'Color': IColorPlugin,
+        'Temperature': ITemperaturePlugin,
+    }
+
+    # init the plugin manager
+    plugin_manager.init_plugin_manager(category_filter=category_filter)
+
+    # collect builtins and explore folder in env var, e.g. ZMON_PLUGINS="/path/one:path/two:/path/three"
+    plugin_manager.collect_plugins(load_builtins=True, load_env=True, additional_dirs=None)
+
+    # check categories
+    all_categories = plugin_manager.get_all_categories()
+    seen_categories = plugin_manager.get_loaded_plugins_categories()
+    assert set(all_categories) == set(category_filter.keys()), 'All defined categories are stored'
+
+    assert len(seen_categories) >= 2 and set(seen_categories).issubset(set(all_categories))
+
+    # check known test plugins are loaded
+    extra_plugins = ['exacrm', 'job_lock', 'nagios', 'snmp', 'mssql']  # non exhaustive list
+    known_plugin_names = extra_plugins + ['http', 'color_spain', 'color_germany', 'temperature_fridge']
+    plugin_names = plugin_manager.get_all_plugin_names()
+    assert set(known_plugin_names).issubset(plugin_names), 'All known test plugins are loaded'
+
+    # check extra plugins
+    for name, category in zip(extra_plugins, ['Function'] * len(extra_plugins)):
+
+        p = plugin_manager.get_plugin_by_name(name, category)
+        p_obj = plugin_manager.get_plugin_obj_by_name(name, category)
+        assert id(p.plugin_object) == id(p_obj), 'locate plugin object works'
+
+        assert p.is_activated is True
+        assert p.plugin_object.is_activated == p.is_activated, 'plugin is activated'
+
+        assert isinstance(p_obj, IFunctionFactoryPlugin), 'plugin object is instance of IFunctionFactoryPlugin'
+
+    # test extra plugin are configured according to config file
+    assert plugin_manager.get_plugin_obj_by_name('exacrm', 'Function')._exacrm_cluster == '--secret--'
+
+
+@patch.dict(os.environ, {'ZMON_PLUGINS': simple_plugin_dir_abs_path()})
+def test_global_config():
+    """
+    Test that the plugin can configure it from the global config and that global config
+    takes precedence over local config
+    """
+    # reload the plugin
+    importlib.reload(plugin_manager)
+
+    # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
+    category_filter = {
+        'Function': IFunctionFactoryPlugin,
+        'Color': IColorPlugin,
+        'Temperature': ITemperaturePlugin,
+    }
+
+    # init the plugin manager
+    plugin_manager.init_plugin_manager(category_filter=category_filter)
+
+    # inject as global conf to color_german plugin fashion sites different from the local conf
+    global_conf = {
+        'plugin.color_germany.fashion_sites': 'superfashion.de hypefashion.de',
+        'plugin.other_plugin.otherkey': 'this will not be passed to color_germany.configure',
+    }
+
+    # collect plugins builtin and explore env_var: ZMON_PLUGINS="/.../tests/plugins/simple_plugins"
+    plugin_manager.collect_plugins(load_builtins=True, load_env=True, additional_dirs=None,
+                                   global_config=global_conf)
+
+    # test that color_german plugin was configured according to the global conf
+
+    global_conf_sites = ['superfashion.de', 'hypefashion.de']
+
+    color_ger_obj = plugin_manager.get_plugin_obj_by_name('color_germany', 'Color')
+
+    assert set(global_conf_sites) == set(color_ger_obj.main_fashion_sites), 'object is configured'
+
+
+@patch.dict(os.environ, {'ZMON_PLUGINS': simple_plugin_dir_abs_path()})
+def test_load_broken_plugins():
+    """
+    Test that we fail predictably on bad plugins and check that we propagate in the exception info to where
+    the error is coming from, either in the exception message or in its traceback
+    """
+
+    for plugin_dir in 'bad_plugin1', 'bad_plugin2', 'bad_plugin3':
+
+        plugin_abs_dir = broken_plugin_dir_abs_path(plugin_dir)
 
         # reload the plugin
         importlib.reload(plugin_manager)
@@ -333,21 +285,51 @@ class TestPluginManager(unittest.TestCase):
         # init the plugin manager
         plugin_manager.init_plugin_manager(category_filter=category_filter)
 
-        # test that we detect all missing dependencies in requirements.txt
-
         is_raised = False
-        requirements = ('some_impossible_dependency', 'other_impossible_dependency', 'yet_another_dependency')
+        our_plugins_words = ['bad_color', 'badcolor', 'badplugin', 'bad_plugin']
         try:
-            # collect only builtin plugins should fail with our custom fatal exception
+            # collect plugins should fail with our custom fatal exception
             plugin_manager.collect_plugins(load_builtins=True, load_env=True, additional_dirs=[plugin_abs_dir])
-
         except plugin_manager.PluginError as e:
             is_raised = True
-            for miss_dep in requirements:
-                self.assertTrue(miss_dep in str(e), 'Missing dependency in requirement file is discovered')
+            exec_all_str = (str(e) + traceback.format_exc()).lower()
+            assert any(s in exec_all_str for s in our_plugins_words)
 
-        self.assertTrue(is_raised)
+        assert is_raised is True
 
 
-if __name__ == '__main__':
-    unittest.main()
+@patch.dict(os.environ, {'ZMON_PLUGINS': simple_plugin_dir_abs_path()})
+def test_plugins_unsatisfied_requirements():
+    """
+    Test that we recognize missing dependencies in requirements.txt files in plugins dirs
+    """
+
+    plugin_abs_dir = broken_plugin_dir_abs_path('plugin_dir_with_requirements')
+
+    # reload the plugin
+    importlib.reload(plugin_manager)
+
+    # Lets create a category filter that includes our builtin plugin type and 2 types we defines for our tests
+    category_filter = {
+        'Function': IFunctionFactoryPlugin,
+        'Color': IColorPlugin,
+        'Temperature': ITemperaturePlugin,
+    }
+
+    # init the plugin manager
+    plugin_manager.init_plugin_manager(category_filter=category_filter)
+
+    # test that we detect all missing dependencies in requirements.txt
+
+    is_raised = False
+    requirements = ('some_impossible_dependency', 'other_impossible_dependency', 'yet_another_dependency')
+    try:
+        # collect only builtin plugins should fail with our custom fatal exception
+        plugin_manager.collect_plugins(load_builtins=True, load_env=True, additional_dirs=[plugin_abs_dir])
+
+    except plugin_manager.PluginError as e:
+        is_raised = True
+        for miss_dep in requirements:
+            assert miss_dep in str(e), 'Missing dependency in requirement file is discovered'
+
+    assert is_raised is True
