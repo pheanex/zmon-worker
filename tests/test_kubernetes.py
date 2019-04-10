@@ -719,6 +719,49 @@ def test_cronjobs(monkeypatch, kwargs, filter_kwargs, res):
     cronjob.objects.return_value.filter.assert_called_with(**filter_kwargs)
 
 
+@pytest.mark.parametrize(
+    'kwargs,filter_kwargs,res',
+    [
+        (
+            {}, {},
+            [
+                resource_mock({'metadata': {'name': 'hpa-1'}, 'spec': {}, 'status': {}}),
+                resource_mock({'metadata': {'name': 'hpa-2'}, 'spec': {}, 'status': {}}),
+                resource_mock({'metadata': {'name': 'hpa-3'}, 'spec': {}, 'status': {}}),
+            ]
+        ),
+        (
+            {'application': 'hpa-1', 'name': 'hpa-1'},
+            {'selector': {'application': 'hpa-1'}, 'field_selector': {'metadata.name': 'hpa-1'}},
+            [resource_mock({'metadata': {'name': 'hpa-1'}, 'spec': {}, 'status': {}})]
+        ),
+        (
+            {'name': 'hpa-2'}, {'field_selector': {'metadata.name': 'hpa-2'}},
+            [resource_mock({'metadata': {'name': 'hpa-2'}, 'spec': {}, 'status': {}}, ready=False)]
+        ),
+    ]
+)
+def test_horizontalpodautoscalers(monkeypatch, kwargs, filter_kwargs, res):
+    client_mock(monkeypatch)
+    get_resources = get_resources_mock(res)
+
+    hpa = MagicMock()
+    query = hpa.objects.return_value.filter.return_value
+
+    monkeypatch.setattr(
+        'zmon_worker_monitor.builtins.plugins.kubernetes.KubernetesWrapper._get_resources', get_resources)
+    monkeypatch.setattr('pykube.HorizontalPodAutoscaler', hpa)
+
+    k = KubernetesWrapper()
+
+    hpas = k.horizontalpodautoscalers(**kwargs)
+
+    assert [r.obj for r in res] == hpas
+
+    get_resources.assert_called_with(query)
+    hpa.objects.return_value.filter.assert_called_with(**filter_kwargs)
+
+
 def test_metrics(monkeypatch):
     client = client_mock(monkeypatch)
 

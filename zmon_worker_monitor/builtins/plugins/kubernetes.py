@@ -40,13 +40,15 @@ class KubernetesFactory(IFunctionFactoryPlugin):
 
 
 class KubernetesWrapper:
-    def __init__(self, namespace='default'):
+    def __init__(self, namespace='default', timeout=30):
         self.__namespace = namespace
+
+        self.timeout = timeout
 
     @property
     def __client(self):
         config = pykube.KubeConfig.from_service_account()
-        client = pykube.HTTPClient(config)
+        client = pykube.HTTPClient(config, timeout=self.timeout)
         client.session.trust_env = False
         return client
 
@@ -433,6 +435,27 @@ class KubernetesWrapper:
         cronjobs = self._get_resources(query)
 
         return [job.obj for job in cronjobs]
+
+    def horizontalpodautoscalers(self, name=None, **kwargs):
+        """
+        Return list of HPAs.
+
+        :param name: HPA name.
+        :type name: str
+
+        :param **kwargs: HPA labelSelector filters.
+        :type **kwargs: dict
+
+        :return: List of HorizontalPodAutoscaler. Typical CronJob has "metadata", "status" and "spec".
+        :rtype: list
+        """
+        filter_kwargs = self._get_filter_kwargs(name=name, **kwargs)
+
+        query = pykube.HorizontalPodAutoscaler.objects(self.__client).filter(**filter_kwargs)
+
+        hpas = self._get_resources(query)
+
+        return [hpa.obj for hpa in hpas]
 
     def metrics(self):
         """
