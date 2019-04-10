@@ -47,11 +47,13 @@ class KairosdbFactory(IFunctionFactoryPlugin):
 
 
 class KairosdbWrapper:
-    def __init__(self, url, oauth2=False):
+    def __init__(self, url, oauth2=False, timeout=30):
         if not url:
             raise ConfigurationError('KairosDB wrapper improperly configured. URL is missing!')
 
         self.url = url
+
+        self.timeout = timeout
 
         self.__session = requests.Session()
 
@@ -198,7 +200,7 @@ class KairosdbWrapper:
             q['end_absolute'] = end_absolute
 
         try:
-            response = self.__session.post(url, json=q)
+            response = self.__session.post(url, json=q, timeout=self.timeout)
             if response.ok:
                 return response.json()['queries']
             else:

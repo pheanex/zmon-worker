@@ -78,12 +78,12 @@ def fx_query(request):
             'metrics': [
                 {
                     'name': 'check1-metric',
-                    'aggregators':  [{'name': 'sum'}],
+                    'aggregators': [{'name': 'sum'}],
                     'group_by': [{'name': 'tags', 'tags': ['k']}]
                 },
                 {
                     'name': 'check2-metric',
-                    'aggregators':  [{'name': 'max'}],
+                    'aggregators': [{'name': 'max'}],
                     'group_by': [{'name': 'tags', 'tags': ['foo']}]
                 },
             ],
@@ -95,11 +95,11 @@ def fx_query(request):
             'metrics': [
                 {
                     'name': 'check1-metric',
-                    'aggregators':  [{'name': 'sum'}],
+                    'aggregators': [{'name': 'sum'}],
                 },
                 {
                     'name': 'check2-metric',
-                    'aggregators':  [{'name': 'max'}],
+                    'aggregators': [{'name': 'max'}],
                 },
             ],
             'start': 2,
@@ -113,11 +113,11 @@ def fx_query(request):
             'metrics': [
                 {
                     'name': 'check1-metric',
-                    'aggregators':  [{'name': 'sum'}],
+                    'aggregators': [{'name': 'sum'}],
                 },
                 {
                     'name': 'check2-metric',
-                    'aggregators':  [{'name': 'max'}],
+                    'aggregators': [{'name': 'max'}],
                 },
             ],
             'start_absolute': 1498049043491,
@@ -273,7 +273,7 @@ def test_kairosdb_query(monkeypatch, fx_query):
         result = cli.query(**kwargs)
         assert result == res['queries'][0]
 
-    post.assert_called_with(get_final_url(), json=q)
+    post.assert_called_with(get_final_url(), json=q, timeout=30)
 
 
 def test_kairosdb_query_batch(monkeypatch, fx_query_batch):
@@ -290,7 +290,7 @@ def test_kairosdb_query_batch(monkeypatch, fx_query_batch):
 
     monkeypatch.setattr('requests.Session.post', post)
 
-    cli = KairosdbWrapper(URL)
+    cli = KairosdbWrapper(URL, timeout=45)
 
     q = get_query_batch(kwargs)
 
@@ -301,7 +301,7 @@ def test_kairosdb_query_batch(monkeypatch, fx_query_batch):
         result = cli.query_batch(**kwargs)
         assert result == res['queries']
 
-    post.assert_called_with(get_final_url(), json=q)
+    post.assert_called_with(get_final_url(), json=q, timeout=45)
 
 
 def test_kairosdb_oauth2(monkeypatch):
