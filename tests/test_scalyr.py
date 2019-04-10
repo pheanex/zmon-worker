@@ -342,7 +342,7 @@ def test_scalyr_count(monkeypatch, fx_count):
     }
 
     post.assert_called_with(
-        scalyr._ScalyrWrapper__timeseries_url, json=final_q, headers={'Content-Type': 'application/json'})
+        scalyr._ScalyrWrapper__timeseries_url, json=final_q, headers={'Content-Type': 'application/json'}, timeout=30)
 
 
 def test_scalyr_logs(monkeypatch, fx_logs):
@@ -379,7 +379,8 @@ def test_scalyr_logs(monkeypatch, fx_logs):
         post.assert_called_with(
             scalyr._ScalyrWrapper__query_url,
             json=query,
-            headers={'Content-Type': 'application/json', 'errorStatus': 'always200'})
+            headers={'Content-Type': 'application/json', 'errorStatus': 'always200'},
+            timeout=30)
 
     except CheckError as e:
         if not res:
@@ -391,14 +392,16 @@ def test_scalyr_logs(monkeypatch, fx_logs):
             post.assert_called_with(
                 scalyr._ScalyrWrapper__query_url,
                 json=query,
-                headers={'Content-Type': 'application/json', 'errorStatus': 'always200'})
+                headers={'Content-Type': 'application/json', 'errorStatus': 'always200'},
+                timeout=30)
         elif not exp:
             assert '{}'.format(e) == 'No logs or error message was returned from scalyr'
             query = expected_query()
             post.assert_called_with(
                 scalyr._ScalyrWrapper__query_url,
                 json=query,
-                headers={'Content-Type': 'application/json', 'errorStatus': 'always200'})
+                headers={'Content-Type': 'application/json', 'errorStatus': 'always200'},
+                timeout=30)
         else:
             raise
 
@@ -421,7 +424,7 @@ def test_scalyr_function(monkeypatch, fx_function):
     query = get_query('numeric', kwargs['function'], read_key, **kwargs)
 
     post.assert_called_with(
-        scalyr._ScalyrWrapper__numeric_url, json=query, headers={'Content-Type': 'application/json'})
+        scalyr._ScalyrWrapper__numeric_url, json=query, headers={'Content-Type': 'application/json'}, timeout=30)
 
 
 def test_scalyr_facets(monkeypatch, fx_facets):
@@ -449,7 +452,7 @@ def test_scalyr_facets(monkeypatch, fx_facets):
     query['maxCount'] = kwargs.get('max_count', 5)
 
     post.assert_called_with(
-        scalyr._ScalyrWrapper__facet_url, json=query, headers={'Content-Type': 'application/json'})
+        scalyr._ScalyrWrapper__facet_url, json=query, headers={'Content-Type': 'application/json'}, timeout=30)
 
 
 def test_scalyr_timeseries(monkeypatch, fx_timeseries):
@@ -463,7 +466,7 @@ def test_scalyr_timeseries(monkeypatch, fx_timeseries):
 
     monkeypatch.setattr('requests.post', post)
 
-    scalyr = ScalyrWrapper(read_key)
+    scalyr = ScalyrWrapper(read_key, timeout=20)
     result = scalyr.timeseries(**kwargs)
 
     assert result == exp
@@ -480,7 +483,7 @@ def test_scalyr_timeseries(monkeypatch, fx_timeseries):
     }
 
     post.assert_called_with(
-        scalyr._ScalyrWrapper__timeseries_url, json=final_q, headers={'Content-Type': 'application/json'})
+        scalyr._ScalyrWrapper__timeseries_url, json=final_q, headers={'Content-Type': 'application/json'}, timeout=20)
 
 
 def test_scalyr_timeseries_aligned(monkeypatch, fx_timeseries_aligned):
@@ -508,7 +511,7 @@ def test_scalyr_timeseries_aligned(monkeypatch, fx_timeseries_aligned):
     }
 
     post.assert_called_with(
-        scalyr._ScalyrWrapper__timeseries_url, json=final_q, headers={'Content-Type': 'application/json'})
+        scalyr._ScalyrWrapper__timeseries_url, json=final_q, headers={'Content-Type': 'application/json'}, timeout=30)
 
 
 def test_scalyr_config_error(monkeypatch):
@@ -533,7 +536,9 @@ def test_scalyr_http_error(monkeypatch, method):
 
 
 @pytest.mark.parametrize(
-        'begin_and_end', [(2880, None), (2880, 0), (2880, 1440), (1439, 0)])
+    'begin_and_end',
+    [(2880, None), (2880, 0), (2880, 1440), (1439, 0)]
+)
 def test_scalyr_timeseries_end(monkeypatch, begin_and_end):
     start, end = begin_and_end
 
@@ -556,4 +561,4 @@ def test_scalyr_timeseries_end(monkeypatch, begin_and_end):
     }
 
     post.assert_called_with(
-        scalyr._ScalyrWrapper__timeseries_url, json=final_q, headers={'Content-Type': 'application/json'})
+        scalyr._ScalyrWrapper__timeseries_url, json=final_q, headers={'Content-Type': 'application/json'}, timeout=30)

@@ -34,7 +34,7 @@ class ScalyrWrapperFactory(IFunctionFactoryPlugin):
 
 
 class ScalyrWrapper:
-    def __init__(self, read_key, scalyr_region=None):
+    def __init__(self, read_key, scalyr_region=None, timeout=30):
         scalyr_prefix = SCALYR_URL_PREFIX_US
 
         if scalyr_region == 'eu':
@@ -44,6 +44,8 @@ class ScalyrWrapper:
         self.__numeric_url = '{}/numericQuery'.format(scalyr_prefix)
         self.__timeseries_url = '{}/timeseriesQuery'.format(scalyr_prefix)
         self.__facet_url = '{}/facetQuery'.format(scalyr_prefix)
+
+        self._timeout = timeout
 
         if not read_key:
             raise ConfigurationError('Scalyr read key is not set.')
@@ -77,6 +79,7 @@ class ScalyrWrapper:
 
         r = requests.post(self.__query_url,
                           json=val,
+                          timeout=self._timeout,
                           headers={'Content-Type': 'application/json', 'errorStatus': 'always200'})
 
         j = r.json()
@@ -104,7 +107,8 @@ class ScalyrWrapper:
         if end is not None:
             val['endTime'] = str(end) + 'm'
 
-        r = requests.post(self.__numeric_url, json=val, headers={'Content-Type': 'application/json'})
+        r = requests.post(self.__numeric_url, json=val, headers={'Content-Type': 'application/json'},
+                          timeout=self._timeout)
 
         r.raise_for_status()
 
@@ -128,7 +132,8 @@ class ScalyrWrapper:
         if end is not None:
             val['endTime'] = str(end) + 'm'
 
-        r = requests.post(self.__facet_url, json=val, headers={'Content-Type': 'application/json'})
+        r = requests.post(self.__facet_url, json=val, headers={'Content-Type': 'application/json'},
+                          timeout=self._timeout)
 
         r.raise_for_status()
 
@@ -162,7 +167,8 @@ class ScalyrWrapper:
         if end_time:
             val['queries'][0]['endTime'] = end_time
 
-        r = requests.post(self.__timeseries_url, json=val, headers={'Content-Type': 'application/json'})
+        r = requests.post(self.__timeseries_url, json=val, headers={'Content-Type': 'application/json'},
+                          timeout=self._timeout)
 
         r.raise_for_status()
 
