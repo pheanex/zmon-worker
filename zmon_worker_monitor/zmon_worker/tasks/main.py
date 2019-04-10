@@ -47,7 +47,7 @@ from zmon_worker_monitor.zmon_worker.common.time_ import parse_timedelta
 from zmon_worker_monitor.zmon_worker.common.utils import flatten, PeriodicBufferedAction
 from zmon_worker_monitor.zmon_worker.encoder import JsonDataEncoder
 from zmon_worker_monitor.zmon_worker.errors import (
-    CheckError, AlertError, InsufficientPermissionsError, SecurityError, ResultSizeError)
+    CheckError, AlertError, InsufficientPermissionsError, SecurityError, ResultSizeError, HttpError)
 from zmon_worker_monitor.zmon_worker.notifications.http import NotifyHttp
 from zmon_worker_monitor.zmon_worker.notifications.hipchat import NotifyHipchat
 from zmon_worker_monitor.zmon_worker.notifications.google_hangouts_chat import NotifyGoogleHangoutsChat
@@ -761,6 +761,7 @@ def build_default_context():
         'xrange': range,
         'ZeroDivisionError': ZeroDivisionError,
         'zip': zip,
+        'ZmonHttpError': HttpError,
     }
 
 
