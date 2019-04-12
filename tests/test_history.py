@@ -109,12 +109,12 @@ def test_history_result(monkeypatch, fx_result):
 
     post, get_request = mock_all(monkeypatch, res)
 
-    cli = HistoryWrapper(url=URL, **wrapper_kwargs)
+    cli = HistoryWrapper(url=URL, timeout=20, **wrapper_kwargs)
 
     result = cli.result(**kwargs)
     assert result == res
 
-    post.assert_called_with(get_final_url(), json=get_request.return_value)
+    post.assert_called_with(get_final_url(), json=get_request.return_value, timeout=20)
 
     assert_get_request(get_request, kwargs, wrapper_kwargs)
 
@@ -129,7 +129,7 @@ def test_history_get_one(monkeypatch, fx_result):
     result = cli.get_one(**kwargs)
     assert result == res['queries'][0]['results'][0]['values']
 
-    post.assert_called_with(get_final_url(), json=get_request.return_value)
+    post.assert_called_with(get_final_url(), json=get_request.return_value, timeout=30)
 
     assert_get_request(get_request, kwargs, wrapper_kwargs)
 
@@ -146,7 +146,7 @@ def test_history_get_aggregated(monkeypatch, fx_result):
 
     assert_aggregator_result(res, result)
 
-    post.assert_called_with(get_final_url(), json=get_request.return_value)
+    post.assert_called_with(get_final_url(), json=get_request.return_value, timeout=30)
 
     assert_get_request(get_request, kwargs, wrapper_kwargs, aggregator)
 
@@ -163,7 +163,7 @@ def test_history_get_avg(monkeypatch, fx_result):
 
     assert_aggregator_result(res, result)
 
-    post.assert_called_with(get_final_url(), json=get_request.return_value)
+    post.assert_called_with(get_final_url(), json=get_request.return_value, timeout=30)
 
     assert_get_request(get_request, kwargs, wrapper_kwargs, aggregator)
 
@@ -180,7 +180,7 @@ def test_history_get_std_dev(monkeypatch, fx_result):
 
     assert_aggregator_result(res, result)
 
-    post.assert_called_with(get_final_url(), json=get_request.return_value)
+    post.assert_called_with(get_final_url(), json=get_request.return_value, timeout=30)
 
     assert_get_request(get_request, kwargs, wrapper_kwargs, aggregator)
 

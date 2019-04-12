@@ -98,12 +98,14 @@ def get_request(check_id, entities, time_from, time_to, aggregator='avg', sampli
 
 
 class HistoryWrapper:
-    def __init__(self, url=None, check_id='', entities=None, oauth2=False):
+    def __init__(self, url=None, check_id='', entities=None, oauth2=False, timeout=30):
         if not url:
             raise ConfigurationError('History wrapper improperly configured. URL is required.')
 
         self.url = os.path.join(url, DATAPOINTS_ENDPOINT)
         self.check_id = check_id
+
+        self.timeout = timeout
 
         if not entities:
             self.entities = []
@@ -119,7 +121,7 @@ class HistoryWrapper:
             self.__session.headers.update({'Authorization': 'Bearer {}'.format(tokens.get('uid'))})
 
     def __query(self, query):
-        response = self.__session.post(self.url, json=query)
+        response = self.__session.post(self.url, json=query, timeout=self.timeout)
 
         if response.ok:
             return response.json()
