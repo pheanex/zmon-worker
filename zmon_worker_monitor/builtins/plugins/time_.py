@@ -49,8 +49,31 @@ class TimeWrapper:
         >>> TimeWrapper('2014-01-01 01:01:25') - TimeWrapper('2014-01-01 01:01:01')
         24.0
         '''
-
         return (self.time - other.time).total_seconds()
+
+    def __gt__(self, other):
+        '''
+        >>> TimeWrapper('2014-01-01 01:01:25') > TimeWrapper('2014-01-01 01:01:01')
+        True
+        '''
+        return self.time > other.time
+
+    def __lt__(self, other):
+        '''
+        >>> TimeWrapper('2014-01-01 01:01:25') < TimeWrapper('2014-01-01 01:01:01')
+        False
+        '''
+        return self.time < other.time
+
+    def __eq__(self, other):
+        '''
+        >>> TimeWrapper('2014-01-01 01:01:25') == TimeWrapper('2014-01-01 01:01:25')
+        True
+
+        >>> TimeWrapper('2014-01-01 01:01:25') == TimeWrapper('2014-01-01 01:01:01')
+        False
+        '''
+        return self.time == other.time
 
     def isoformat(self, sep=' '):
         return self.time.isoformat(sep)
@@ -65,3 +88,6 @@ class TimeWrapper:
         '''
 
         return self.time.strftime(fmt)
+
+    def __str__(self):
+        return self.isoformat()
