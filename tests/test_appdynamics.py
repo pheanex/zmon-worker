@@ -238,7 +238,7 @@ def test_appdynamics_data_metric(monkeypatch, fx_data_metric):
 
 def test_appdynamics_data_metric_kwargs_error(fx_data_metric_invalid_kwargs):
     cli = AppdynamicsWrapper(URL, USER, PASS)
-    with pytest.raises(Exception, match=r"mandatory") as e:
+    with pytest.raises(Exception, match=r"mandatory"):
         cli.metric_data(**fx_data_metric_invalid_kwargs)
 
 
