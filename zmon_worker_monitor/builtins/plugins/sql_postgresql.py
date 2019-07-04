@@ -121,6 +121,7 @@ class SqlWrapper:
             raise CheckError('SqlWrapper: Shard {} not found in shards definition'.format(shard))
 
         self._cursors = []
+        self._conns = []
         self._stmt = None
         permissions = {}
 
@@ -146,6 +147,7 @@ class SqlWrapper:
                 cursor = conn.cursor(cursor_factory=NamedTupleCursor)
                 cursor.execute("SET statement_timeout TO %s;", [timeout])
                 self._cursors.append(cursor)
+                self._conns.append(conn)
             except Exception as e:
                 raise DbError(str(e), operation='Connect to {}'.format(shard_def)).with_traceback(sys.exc_info()[2])
             try:
@@ -159,6 +161,19 @@ class SqlWrapper:
         for resource, permitted in permissions.items():
             if not permitted:
                 raise InsufficientPermissionsError(created_by, resource)
+
+    def __del__(self):
+        for cur in self._cursors:
+            try:
+                if not cur.closed:
+                    cur.close()
+            except Exception:
+                pass
+        for conn in self._conns:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
     def execute(self, stmt):
         self._stmt = stmt
@@ -207,8 +222,9 @@ class SqlWrapper:
                         rows = cur.fetchmany(max_results + 1)
                         if len(rows) > max_results:
                             raise DbError(
-                                ('Too many results, result set was limited to {}. '
-                                 'Try setting max_results to a higher value.').format(max_results),
+                                ('Too many results, result set was limited to {} for performance reasons. '
+                                 'Consider modifying query to limit number of rows returns. '
+                                 'If all else fails, try setting max_results to a higher value.').format(max_results),
                                 operation=self._stmt)
                     else:
                         rows = cur.fetchmany(max_results)
