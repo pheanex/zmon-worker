@@ -149,7 +149,7 @@ class Mail(BaseNotification):
                     is_protected = True  # localhost is fine
                     s = smtplib.SMTP(mail_host, mail_port)
 
-            except Exception, e:
+            except Exception as e:
                 current_span.set_tag('error', True)
                 logger.exception('Error connecting to SMTP server %s for alert %s with id %s: %s',
                                  mail_host, alert_def['name'], alert_def['id'], str(e))
@@ -167,7 +167,7 @@ class Mail(BaseNotification):
                     logger.exception(
                         'Error sending email for alert %s with id %s: authentication failed for %s',
                         alert_def['name'], alert_def['id'], mail_user)
-                except Exception, e:
+                except Exception as e:
                     current_span.set_tag('error', True)
                     current_span.log_kv({'exception': traceback.format_exc()})
                     logger.exception(
