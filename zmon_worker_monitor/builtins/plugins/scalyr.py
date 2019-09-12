@@ -174,21 +174,21 @@ class ScalyrWrapper(object):
             return [x * minutes / buckets for x in j['results'][0]['values']]
         return j
 
-    def power_query(self, query, max_count=100, minutes=5, end=0):
+    def power_query(self, query, minutes=5, end=0):
         if not query or not query.strip():
             raise CheckError('query "{}" is not allowed to be blank'.format(query))
 
-        val = {
+        value = {
             'token': self.__read_key,
             'query': query,
             'startTime': str(minutes) + 'm',
             'priority': 'low',
         }
         if end is not None:
-            val['endTime'] = str(end) + 'm'
+            value['endTime'] = str(end) + 'm'
 
         response = requests.post(self.__power_query_url,
-                                 json=val,
+                                 json=value,
                                  headers={'Content-Type': 'application/json', 'errorStatus': 'always200'})
 
         json_response = response.json()

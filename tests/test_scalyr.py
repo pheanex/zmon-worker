@@ -7,6 +7,8 @@ from mock import MagicMock
 from zmon_worker_monitor.builtins.plugins.scalyr import ScalyrWrapper, ConfigurationError
 from zmon_worker_monitor.zmon_worker.errors import CheckError
 
+SCALYR_READ_KEY = '123'
+
 
 @pytest.fixture(params=[
     (
@@ -272,6 +274,66 @@ def fx_timeseries_aligned(request):
     return request.param
 
 
+@pytest.fixture(params=[
+    ({'query': 'power-query'},
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '5m',
+         'priority': 'low',
+     },
+     {},
+     None),
+    ({'query': 'power-query', 'minutes': 7},
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '5m',
+         'priority': 'low',
+     },
+     {},
+     None),
+    ({'query': 'power-query', 'minutes': 7, 'end': None},
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '5m',
+         'priority': 'low',
+     },
+     {},
+     None),
+    ({'query': 'power-query', 'minutes': 7, 'end': 3},
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '5m',
+         'priority': 'low',
+     },
+     {},
+     None),
+    ({'query': 'power-query'},  # malformed powerquery without message
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '5m',
+         'priority': 'low',
+     },
+     {},
+     CheckError('Unexpected error message was returned from scalyr')),
+    ({'query': 'power-query'},  # malformed powerquery with message
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '5m',
+         'priority': 'low',
+     },
+     {},
+     CheckError('Expected error message from Scalyr')),
+])
+def fx_power_query(request):
+    return request.param
+
+
 def get_query(query_type, func, key, **kwargs):
     if 'end' not in kwargs:
         kwargs['end'] = 0
@@ -401,6 +463,29 @@ def test_scalyr_logs(monkeypatch, fx_logs):
                 headers={'Content-Type': 'application/json', 'errorStatus': 'always200'})
         else:
             raise
+
+
+def test_scalyr_power_query(monkeypatch, fx_power_query):
+    kwargs, request, response, expected_exception = fx_power_query
+
+    post = MagicMock()
+    post.return_value.json.return_value = response
+
+    monkeypatch.setattr('requests.post', post)
+
+    scalyr = ScalyrWrapper(SCALYR_READ_KEY)
+    try:
+        result = scalyr.logs(**kwargs)
+        assert result == response
+        assert expected_exception is None
+
+        post.assert_called_with(
+            scalyr._ScalyrWrapper__power_query_url,
+            json=request,
+            headers={'Content-Type': 'application/json', 'errorStatus': 'always200'})
+
+    except CheckError as error:
+        assert error == expected_exception
 
 
 def test_scalyr_function(monkeypatch, fx_function):
