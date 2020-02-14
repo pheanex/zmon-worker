@@ -99,25 +99,28 @@ class ScalyrWrapper(object):
 
         val = {
             'token': self.__read_key,
-            'queryType': 'numeric',
-            'filter': query,
-            'function': function,
-            'startTime': parse_timestamp(minutes),
-            'priority': 'low',
-            'buckets': 1
+            'queries': [
+                {
+                    'filter': query,
+                    'function': function,
+                    'startTime': parse_timestamp(minutes),
+                    'priority': 'low',
+                    'buckets': 1
+                }
+            ]
         }
         if end is not None:
-            val['endTime'] = parse_timestamp(end)
+            for query in val['queries']:
+                query['endTime'] = parse_timestamp(end)
 
-        r = requests.post(self.__numeric_url, json=val, headers={'Content-Type': 'application/json'})
+        r = requests.post(self.__timeseries_url, json=val, headers={'Content-Type': 'application/json'})
 
         r.raise_for_status()
 
         j = r.json()
-        if 'values' in j:
-            return j['values'][0]
-        else:
-            return j
+        results = j.get('results', [])
+        values = results[0] if results else []
+        return values[0] if values else j
 
     def facets(self, filter, field, max_count=5, minutes=30, prio='low', end=0):
 
