@@ -4,8 +4,10 @@ import time
 
 from mock import MagicMock
 
-from zmon_worker_monitor.builtins.plugins.scalyr import ScalyrWrapper, ConfigurationError
+from zmon_worker_monitor.builtins.plugins.scalyr import ScalyrWrapper, ConfigurationError, parse_timestamp
 from zmon_worker_monitor.zmon_worker.errors import CheckError
+
+SCALYR_READ_KEY = '123'
 
 
 @pytest.fixture(params=[
@@ -272,6 +274,92 @@ def fx_timeseries_aligned(request):
     return request.param
 
 
+power_query_response = {
+    'columns': [{'name': 'host'}, {'name': 'application'}, {'name': 'volume'}],
+    'warnings': [],
+    'values': [
+        ['aws:085668006708:eu-central-1:kube-1', 'kairosdb-test-2-read', 9481810.0],
+        ['aws:085668006708:eu-central-1:kube-1', 'kairosdb-test-1-read', 8109726.0],
+    ],
+    'matchingEvents': 8123.0,
+    'status': 'success',
+    'omittedEvents': 0.0,
+}
+
+
+@pytest.fixture(params=[
+    ({'query': 'power-query'},
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '5m',
+         'endTime': '0m',
+         'priority': 'low',
+     },
+     power_query_response,
+     None),
+    ({'query': 'power-query', 'minutes': 7},
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '7m',
+         'endTime': '0m',
+         'priority': 'low',
+     },
+     power_query_response,
+     None),
+    ({'query': 'power-query', 'minutes': 7, 'end': None},
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '7m',
+         'priority': 'low',
+     },
+     power_query_response,
+     None),
+    ({'query': 'power-query', 'minutes': 7, 'end': 3},
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '7m',
+         'endTime': '3m',
+         'priority': 'low',
+     },
+     power_query_response,
+     None),
+    ({'query': 'power-query', 'minutes': '2017-10-11T10:45:00+0800', 'end': '2017-10-11T11:45:00+0800'},
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '2017-10-11T10:45:00+0800',
+         'endTime': '2017-10-11T11:45:00+0800',
+         'priority': 'low',
+     },
+     power_query_response,
+     None),
+    ({'query': 'power-query'},  # malformed powerquery without message
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '5m',
+         'priority': 'low',
+     },
+     {'status': 'error/something'},
+     CheckError('Unexpected error message was returned from scalyr')),
+    ({'query': 'power-query'},  # malformed powerquery with message
+     {
+         'token': SCALYR_READ_KEY,
+         'query': 'power-query',
+         'startTime': '5m',
+         'priority': 'low',
+     },
+     {'status': 'error/something', 'message': 'Expected error message from Scalyr'},
+     CheckError('Expected error message from Scalyr')),
+])
+def fx_power_query(request):
+    return request.param
+
+
 def get_query(query_type, func, key, **kwargs):
     if 'end' not in kwargs:
         kwargs['end'] = 0
@@ -401,6 +489,33 @@ def test_scalyr_logs(monkeypatch, fx_logs):
                 headers={'Content-Type': 'application/json', 'errorStatus': 'always200'})
         else:
             raise
+
+
+def test_scalyr_power_query(monkeypatch, fx_power_query):
+    kwargs, request, response, expected_exception = fx_power_query
+
+    post = MagicMock()
+    post.return_value.json.return_value = response
+
+    monkeypatch.setattr('requests.post', post)
+
+    scalyr = ScalyrWrapper(SCALYR_READ_KEY)
+    try:
+        result = scalyr.power_query(**kwargs)
+        assert result == response
+        assert expected_exception is None
+
+        post.assert_called_with(
+            scalyr._ScalyrWrapper__power_query_url,
+            json=request,
+            headers={'Content-Type': 'application/json', 'errorStatus': 'always200'})
+
+    except AssertionError:
+        raise
+
+    except Exception as error:
+        assert isinstance(error, type(expected_exception))
+        assert error.args == expected_exception.args
 
 
 def test_scalyr_function(monkeypatch, fx_function):
@@ -557,3 +672,14 @@ def test_scalyr_timeseries_end(monkeypatch, begin_and_end):
 
     post.assert_called_with(
         scalyr._ScalyrWrapper__timeseries_url, json=final_q, headers={'Content-Type': 'application/json'})
+
+
+@pytest.mark.parametrize('input_time,output_time', [
+    ('', ''),
+    (5, '5m'),
+    (0, '0m'),
+    ('5', '5'),
+    ('2017-10-11T10:45:00+0800', '2017-10-11T10:45:00+0800'),
+    (5.0, '5.0m')])
+def test_parse_timestamp(input_time, output_time):
+    assert parse_timestamp(input_time) == output_time

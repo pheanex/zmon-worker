@@ -16,8 +16,10 @@ STATS = {
     "instantaneous_ops_per_sec": 29626,
     "keyspace_hits_per_sec": 1195.43,
     "keyspace_misses_per_sec": 1237.99,
+    "maxmemory": 152343648,
     "used_memory": 50781216,
     "used_memory_rss": 63475712,
+    "used_memory_lua": 475712,
     "foo": "bar"
 }
 
@@ -79,5 +81,7 @@ def test_redis_parametrized(monkeypatch, kwargs):
         kwargs.get('db', 0),
         kwargs.get('password'),
         socket_connect_timeout=kwargs.get('socket_connect_timeout', 1),
-        socket_timeout=kwargs.get('socket_timeout', 5)
+        socket_timeout=kwargs.get('socket_timeout', 5),
+        ssl=False,
+        ssl_cert_reqs='required'
     )

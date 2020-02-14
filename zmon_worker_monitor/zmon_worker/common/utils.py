@@ -1,8 +1,10 @@
-import Queue
 import logging
+import Queue
 import random
 import threading
 import time
+
+import psutil
 
 
 def flatten(structure, key='', path='', flattened=None):
@@ -14,8 +16,8 @@ def flatten(structure, key='', path='', flattened=None):
     >>> sorted(flatten({'a': {'b': 'c'}, 'd': 'e'}).items())
     [('a.b', 'c'), ('d', 'e')]
     '''
-    path = str(path)
-    key = str(key)
+    path = path.encode("utf-8") if isinstance(path, unicode) else str(path)
+    key = key.encode("utf-8") if isinstance(key, unicode) else str(key)
 
     if flattened is None:
         flattened = {}
@@ -101,3 +103,11 @@ class PeriodicBufferedAction(object):
             else:
                 # so loop is responsive to stop commands
                 time.sleep(0.2)
+
+
+def get_process_cmdline(pid):
+    try:
+        # Some OSes report cmdline differently - join for 'zmon-worker check 999'...
+        return ' '.join(filter(bool, psutil.Process(pid).cmdline()))
+    except: # noqa
+        return 'N/A'

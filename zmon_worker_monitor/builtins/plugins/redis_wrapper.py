@@ -17,7 +17,9 @@ STATISTIC_GAUGE_KEYS = frozenset([
     'master_repl_offset',
     'role',
     'slave0',
+    'maxmemory',
     'used_memory',
+    'used_memory_lua',
     'used_memory_peak',
     'used_memory_rss',
 ])
@@ -68,7 +70,9 @@ class RedisFactory(IFunctionFactoryPlugin):
 class RedisWrapper(object):
     '''Class to allow only readonly access to underlying redis connection'''
 
-    def __init__(self, counter, host, port=6379, db=0, password=None, socket_connect_timeout=1, socket_timeout=5):
+    def __init__(self, counter, host, port=6379, db=0, password=None,
+                 socket_connect_timeout=1, socket_timeout=5, ssl=False,
+                 ssl_cert_reqs='required'):
         if not host:
             raise ConfigurationError('Redis wrapper improperly configured. Valid redis host is required!')
 
@@ -79,7 +83,9 @@ class RedisWrapper(object):
             db,
             password,
             socket_connect_timeout=socket_connect_timeout,
-            socket_timeout=socket_timeout
+            socket_timeout=socket_timeout,
+            ssl=ssl,
+            ssl_cert_reqs=ssl_cert_reqs
         )
 
     def llen(self, key):
@@ -96,6 +102,9 @@ class RedisWrapper(object):
 
     def hgetall(self, key):
         return self.__con.hgetall(key)
+
+    def hlen(self, key):
+        return self.__con.hlen(key)
 
     def scan(self, cursor, match=None, count=None):
         return self.__con.scan(cursor, match=match, count=count)
@@ -117,6 +126,9 @@ class RedisWrapper(object):
 
     def zrange(self, key, start, end, desc=False, withscores=False, score_cast_func=float):
         return self.__con.zrange(key, start, end, desc, withscores, score_cast_func)
+
+    def info(self, section):
+        return self.__con.info(section)
 
     def statistics(self):
         '''

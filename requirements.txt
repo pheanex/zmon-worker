@@ -9,14 +9,17 @@ flask-restful-swagger==0.19
 Flask-RESTful==0.3.5
 Flask==0.10.1
 functional==0.4
+google-cloud-bigquery==1.7.0
 ipaddress==1.0.22
 Jinja2==2.10
 jsonpath-rw==1.4.0
 MarkupSafe==1.0
 numpy==1.15.1
-opentracing>=1.2.2,<2
 opentracing-utils>=0.14,<1
+opentracing>=1.2.2,<2
 prometheus-client==0.3.1
+psycopg2==2.8.3
+psutil==5.6.3
 pykube==0.15.0
 pymemcache>=1.4.3
 pymongo==3.0.3
@@ -34,4 +37,5 @@ setproctitle==1.1.10
 stups-tokens>=1.0.14,<2
 subprocess32==3.5.2
 timeperiod2==0.1
+tzlocal==2.0.0
 Yapsy==1.11.223
